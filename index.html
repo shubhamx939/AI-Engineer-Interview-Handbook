@@ -1,0 +1,3174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Round 2 AI Agent Interview War Room</title>
+  <style>
+    :root {
+      --bg: #f7f3ea;
+      --panel: #fffdf8;
+      --panel-strong: #fff7e7;
+      --ink: #18212f;
+      --muted: #566070;
+      --line: #d9cfbb;
+      --navy: #163b68;
+      --teal: #0d7a6c;
+      --gold: #b57710;
+      --rust: #b54a2c;
+      --rose: #8e3350;
+      --slate: #334155;
+      --intake: #d8ecff;
+      --reasoning: #daf5e8;
+      --control: #fff0ce;
+      --ops: #f7dce3;
+      --shadow: 0 12px 40px rgba(24, 33, 47, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1440px;
+      --nav-width: 270px;
+      --display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+      --body: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--body);
+      background:
+        radial-gradient(circle at top left, rgba(22, 59, 104, 0.06), transparent 24%),
+        radial-gradient(circle at top right, rgba(13, 122, 108, 0.06), transparent 20%),
+        linear-gradient(180deg, #faf6ef 0%, #f7f3ea 45%, #f3eee3 100%);
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--navy);
+    }
+
+    h1, h2, h3, h4 {
+      margin: 0 0 0.65rem;
+      line-height: 1.12;
+    }
+
+    h1, h2 {
+      font-family: var(--display);
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0 0 0.9rem;
+    }
+
+    ul {
+      margin: 0.2rem 0 1rem 1.2rem;
+      padding: 0;
+    }
+
+    li + li {
+      margin-top: 0.35rem;
+    }
+
+    code, .mono {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.95em;
+    }
+
+    .shell {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: var(--nav-width) minmax(0, 1fr);
+      gap: 1.2rem;
+      padding: 1rem;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      background: rgba(255, 253, 248, 0.9);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(217, 207, 187, 0.9);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 1rem;
+    }
+
+    .brand {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.9rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 0.5rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(22, 59, 104, 0.08);
+      color: var(--navy);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+    }
+
+    .brand h1 {
+      font-size: 1.45rem;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 0.94rem;
+      margin-bottom: 0;
+    }
+
+    .nav {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 0.55rem 0.65rem;
+      border-radius: 10px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .nav a.active,
+    .nav a:hover {
+      background: rgba(22, 59, 104, 0.08);
+      color: var(--navy);
+    }
+
+    .sidebar-note {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,240,206,0.9), rgba(255,247,231,0.95));
+      border: 1px solid rgba(181, 119, 16, 0.18);
+      font-size: 0.88rem;
+      color: #5d4a1a;
+    }
+
+    main {
+      min-width: 0;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(22,59,104,0.94), rgba(37,83,120,0.93) 44%, rgba(13,122,108,0.9) 100%);
+      color: white;
+      border-radius: 28px;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -35% auto;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.16), transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 0.85fr;
+      gap: 1.2rem;
+      align-items: end;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero p {
+      max-width: 70ch;
+      color: rgba(255,255,255,0.92);
+      font-size: 1.02rem;
+    }
+
+    .hero-cards {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .hero-card {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 18px;
+      padding: 0.95rem;
+      backdrop-filter: blur(5px);
+    }
+
+    .hero-card strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.96rem;
+    }
+
+    .panel {
+      background: rgba(255, 253, 248, 0.94);
+      border: 1px solid rgba(217, 207, 187, 0.95);
+      border-radius: 24px;
+      padding: 1.35rem;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 1rem;
+    }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: end;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.85rem;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.55rem, 2.2vw, 2.2rem);
+    }
+
+    .section-kicker {
+      max-width: 56ch;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(22, 59, 104, 0.08);
+      border: 1px solid rgba(22, 59, 104, 0.12);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .metrics,
+    .role-grid,
+    .story-grid,
+    .memory-grid,
+    .mini-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .metric {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,247,231,0.74));
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.7rem;
+      color: var(--navy);
+      margin-bottom: 0.25rem;
+      font-family: var(--display);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .role-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .lens-card,
+    .story-card,
+    .play-card,
+    .question-card,
+    .arch-card,
+    .workflow-card,
+    .flash-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,249,238,0.88));
+      padding: 1rem;
+      min-width: 0;
+    }
+
+    .lens-card h3,
+    .story-card h3,
+    .play-card h3,
+    .question-card h3,
+    .arch-card h3 {
+      font-size: 1.1rem;
+    }
+
+    .two-col,
+    .tri-col,
+    .case-grid,
+    .arch-grid,
+    .workflow-grid,
+    .qna-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .two-col {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tri-col {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .case-grid {
+      grid-template-columns: 1.05fr 0.95fr;
+    }
+
+    .workflow-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .workflow-card {
+      position: relative;
+      overflow: hidden;
+      padding-top: 2.55rem;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,250,241,0.92));
+      box-shadow: 0 12px 28px rgba(24,33,47,0.05);
+    }
+
+    .workflow-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+    }
+
+    .workflow-card::after {
+      content: attr(data-phase);
+      position: absolute;
+      top: 0.72rem;
+      left: 0.78rem;
+      padding: 0.22rem 0.58rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45);
+    }
+
+    .workflow-card.intake::before { background: var(--navy); }
+    .workflow-card.reasoning::before { background: var(--teal); }
+    .workflow-card.control::before { background: var(--gold); }
+    .workflow-card.ops::before { background: var(--rose); }
+
+    .workflow-card.intake::after {
+      background: rgba(216,236,255,0.96);
+      color: var(--navy);
+    }
+
+    .workflow-card.reasoning::after {
+      background: rgba(218,245,232,0.98);
+      color: var(--teal);
+    }
+
+    .workflow-card.control::after {
+      background: rgba(255,240,206,0.98);
+      color: var(--gold);
+    }
+
+    .workflow-card.ops::after {
+      background: rgba(247,220,227,0.98);
+      color: var(--rose);
+    }
+
+    .workflow-card .step {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: block;
+      margin-bottom: 0.42rem;
+    }
+
+    .lane-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .lane {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.32rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .lane::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .lane.intake { background: var(--intake); color: var(--navy); }
+    .lane.reasoning { background: var(--reasoning); color: var(--teal); }
+    .lane.control { background: var(--control); color: var(--gold); }
+    .lane.ops { background: var(--ops); color: var(--rose); }
+
+    .callout,
+    .script,
+    .safety-box,
+    .legend-box {
+      border-radius: 18px;
+      padding: 1rem;
+    }
+
+    .callout {
+      background: linear-gradient(180deg, rgba(216,236,255,0.88), rgba(255,255,255,0.88));
+      border: 1px solid rgba(22, 59, 104, 0.16);
+    }
+
+    .script {
+      background: linear-gradient(180deg, rgba(255,247,231,0.9), rgba(255,255,255,0.88));
+      border: 1px solid rgba(181, 119, 16, 0.16);
+    }
+
+    .safety-box {
+      background: linear-gradient(180deg, rgba(247,220,227,0.9), rgba(255,255,255,0.9));
+      border: 1px solid rgba(142, 51, 80, 0.16);
+    }
+
+    .legend-box {
+      background: linear-gradient(180deg, rgba(218,245,232,0.9), rgba(255,255,255,0.9));
+      border: 1px solid rgba(13, 122, 108, 0.16);
+    }
+
+    .ribbon {
+      display: inline-block;
+      margin-bottom: 0.55rem;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--navy);
+    }
+
+    .micro-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .diagram-shell {
+      margin-top: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(249,243,232,0.96)),
+        repeating-linear-gradient(90deg, rgba(22,59,104,0.03) 0, rgba(22,59,104,0.03) 1px, transparent 1px, transparent 48px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    .diagram-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.95rem 1rem;
+      border-bottom: 1px solid rgba(217, 207, 187, 0.9);
+      background: rgba(255,255,255,0.7);
+    }
+
+    .diagram-head h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .diagram-head p {
+      margin: 0.2rem 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      max-width: 65ch;
+    }
+
+    .live-badge {
+      position: relative;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(13,122,108,0.1);
+      color: var(--teal);
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .live-badge::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 0.45rem;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 0 rgba(13,122,108,0.55);
+      animation: heartbeat-dot 1.6s infinite ease-out;
+      vertical-align: middle;
+    }
+
+    .diagram-stage {
+      padding: 1rem;
+    }
+
+    .agent-map {
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .agent-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.9rem;
+      align-items: stretch;
+    }
+
+    .agent-row.center {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .agent-node {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.92);
+      padding: 0.95rem 0.95rem 0.9rem 1rem;
+      min-height: 126px;
+      box-shadow: 0 8px 24px rgba(24,33,47,0.05);
+    }
+
+    .agent-node::after {
+      content: "";
+      position: absolute;
+      top: 0.85rem;
+      right: 0.85rem;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.7;
+      box-shadow: 0 0 0 0 currentColor;
+      animation: heartbeat-node 1.8s infinite ease-out;
+    }
+
+    .agent-node h4 {
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .agent-node p {
+      font-size: 0.9rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .agent-node small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
+    .agent-node.intake-node { color: var(--navy); background: linear-gradient(180deg, rgba(216,236,255,0.92), rgba(255,255,255,0.94)); }
+    .agent-node.reasoning-node { color: var(--teal); background: linear-gradient(180deg, rgba(218,245,232,0.94), rgba(255,255,255,0.94)); }
+    .agent-node.control-node { color: var(--gold); background: linear-gradient(180deg, rgba(255,240,206,0.96), rgba(255,255,255,0.94)); }
+    .agent-node.ops-node { color: var(--rose); background: linear-gradient(180deg, rgba(247,220,227,0.94), rgba(255,255,255,0.94)); }
+
+    .agent-connector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 0.2rem 0;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.76rem;
+    }
+
+    .agent-connector::before,
+    .agent-connector::after {
+      content: "";
+      flex: 1;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(22,59,104,0.15), rgba(22,59,104,0.7), rgba(22,59,104,0.15));
+      background-size: 200% 100%;
+      animation: heartbeat-line 2.4s linear infinite;
+    }
+
+    .loop-board {
+      position: relative;
+      border-radius: 24px;
+      padding: 1.25rem;
+      background:
+        radial-gradient(circle at center, rgba(22,59,104,0.05), transparent 48%),
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(249,243,232,0.96));
+      min-height: 620px;
+      overflow: hidden;
+    }
+
+    .loop-center {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      transform: translate(-50%, -50%);
+      width: min(32vw, 290px);
+      max-width: 290px;
+      min-width: 210px;
+      padding: 1rem;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(22,59,104,0.96), rgba(37,83,120,0.94));
+      color: white;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(22,59,104,0.22);
+      z-index: 2;
+    }
+
+    .loop-center::after {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      border-radius: 28px;
+      border: 2px solid rgba(22,59,104,0.12);
+      animation: heartbeat-ring 2.2s infinite ease-out;
+      z-index: -1;
+    }
+
+    .loop-center h4 {
+      margin-bottom: 0.45rem;
+      font-size: 1.1rem;
+    }
+
+    .loop-node {
+      position: absolute;
+      width: min(19vw, 220px);
+      max-width: 220px;
+      min-width: 165px;
+      padding: 0.9rem;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(24,33,47,0.08);
+      z-index: 2;
+    }
+
+    .loop-node h4 {
+      font-size: 0.96rem;
+      margin-bottom: 0.32rem;
+    }
+
+    .loop-node p {
+      font-size: 0.84rem;
+      margin: 0;
+    }
+
+    .loop-node small {
+      display: block;
+      margin-top: 0.4rem;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.4;
+    }
+
+    .loop-node::after {
+      content: "";
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 0 currentColor;
+      opacity: 0.8;
+      animation: heartbeat-node 2s infinite ease-out;
+    }
+
+    .loop-node.intake-node { background: linear-gradient(180deg, rgba(216,236,255,0.96), rgba(255,255,255,0.94)); color: var(--navy); }
+    .loop-node.reasoning-node { background: linear-gradient(180deg, rgba(218,245,232,0.96), rgba(255,255,255,0.94)); color: var(--teal); }
+    .loop-node.control-node { background: linear-gradient(180deg, rgba(255,240,206,0.98), rgba(255,255,255,0.94)); color: var(--gold); }
+    .loop-node.ops-node { background: linear-gradient(180deg, rgba(247,220,227,0.96), rgba(255,255,255,0.94)); color: var(--rose); }
+
+    .loop-top { top: 1.1rem; left: 50%; transform: translateX(-50%); }
+    .loop-top-right { top: 5.8rem; right: 0.6rem; }
+    .loop-right { top: 50%; right: 0.6rem; transform: translateY(-50%); }
+    .loop-bottom-right { bottom: 5.6rem; right: 0.6rem; }
+    .loop-bottom { bottom: 1rem; left: 50%; transform: translateX(-50%); }
+    .loop-bottom-left { bottom: 5.6rem; left: 0.6rem; }
+    .loop-left { top: 50%; left: 0.6rem; transform: translateY(-50%); }
+    .loop-top-left { top: 5.8rem; left: 0.6rem; }
+
+    .loop-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .loop-path {
+      fill: none;
+      stroke: rgba(22,59,104,0.18);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dasharray: 10 12;
+      animation: heartbeat-stroke 4.5s linear infinite;
+    }
+
+    .loop-pulse {
+      fill: rgba(22,59,104,0.94);
+      filter: drop-shadow(0 0 8px rgba(22,59,104,0.28));
+      animation: heartbeat-pulse 4.5s linear infinite;
+    }
+
+    .aws-architecture-board {
+      display: grid;
+      gap: 1rem;
+      padding: 1.25rem;
+      border-radius: 28px;
+      border: 1px solid rgba(22,59,104,0.14);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.92), rgba(246,242,234,0.95)),
+        radial-gradient(circle at top right, rgba(22,59,104,0.06), transparent 26%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45), var(--shadow);
+    }
+
+    .aws-meta-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .aws-meta {
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.86);
+      padding: 0.85rem 0.9rem;
+    }
+
+    .aws-meta strong {
+      display: block;
+      color: var(--navy);
+      margin-bottom: 0.2rem;
+    }
+
+    .aws-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.9rem;
+      align-items: stretch;
+    }
+
+    .aws-column {
+      display: grid;
+      gap: 0.8rem;
+      align-content: start;
+    }
+
+    .aws-column-head {
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border: 1px solid rgba(22, 59, 104, 0.12);
+      color: var(--navy);
+      background: rgba(22,59,104,0.06);
+    }
+
+    .aws-column-head.edge { background: rgba(216,236,255,0.8); color: var(--navy); }
+    .aws-column-head.runtime { background: rgba(218,245,232,0.88); color: var(--teal); }
+    .aws-column-head.data { background: rgba(255,240,206,0.86); color: var(--gold); }
+    .aws-column-head.ops { background: rgba(247,220,227,0.86); color: var(--rose); }
+
+    .aws-card {
+      position: relative;
+      min-height: 118px;
+      padding: 0.95rem 1rem;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.88);
+      box-shadow: 0 10px 26px rgba(24,33,47,0.08);
+      overflow: hidden;
+    }
+
+    .aws-card::after {
+      content: "";
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 0 currentColor;
+      opacity: 0.9;
+      animation: heartbeat-node 2.2s infinite ease-out;
+    }
+
+    .aws-card.edge-card { color: var(--navy); background: linear-gradient(180deg, rgba(216,236,255,0.94), rgba(255,255,255,0.94)); }
+    .aws-card.runtime-card { color: var(--teal); background: linear-gradient(180deg, rgba(218,245,232,0.96), rgba(255,255,255,0.94)); }
+    .aws-card.data-card { color: var(--gold); background: linear-gradient(180deg, rgba(255,240,206,0.96), rgba(255,255,255,0.94)); }
+    .aws-card.ops-card { color: var(--rose); background: linear-gradient(180deg, rgba(247,220,227,0.96), rgba(255,255,255,0.94)); }
+
+    .aws-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .aws-card p {
+      font-size: 0.88rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .aws-card small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .aws-route-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .aws-route {
+      padding: 0.7rem 0.8rem;
+      border-radius: 18px;
+      border: 1px dashed rgba(22,59,104,0.2);
+      background: rgba(255,255,255,0.76);
+      font-size: 0.83rem;
+      color: var(--slate);
+    }
+
+    .aws-route strong {
+      color: var(--navy);
+    }
+
+    .aws-spoken-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .micro-cell {
+      border-radius: 16px;
+      border: 1px dashed rgba(86, 96, 112, 0.3);
+      background: rgba(255,255,255,0.75);
+      padding: 0.8rem;
+    }
+
+    .micro-cell strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: var(--slate);
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.78);
+      padding: 0.15rem 0.9rem 0.7rem;
+    }
+
+    details + details {
+      margin-top: 0.75rem;
+    }
+
+    summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 0.85rem 0 0.45rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .chip {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.45rem 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      padding: 1rem;
+      border-radius: 18px;
+      background: #18212f;
+      color: #edf4ff;
+      border: 1px solid rgba(22, 59, 104, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    pre code {
+      display: block;
+      white-space: pre;
+      line-height: 1.55;
+      font-size: 0.86rem;
+      color: inherit;
+    }
+
+    .code-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .code-card + .code-card {
+      margin-top: 1rem;
+    }
+
+    .code-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(217, 207, 187, 0.92);
+      background: linear-gradient(180deg, rgba(255,253,248,0.95), rgba(249,243,232,0.95));
+    }
+
+    .code-head strong {
+      display: block;
+      color: var(--navy);
+      font-size: 0.98rem;
+    }
+
+    .code-head span {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .code-body {
+      padding: 1rem;
+    }
+
+    .step-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .step-pill {
+      border-radius: 18px;
+      padding: 0.9rem;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,247,231,0.9));
+    }
+
+    .step-pill strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: var(--navy);
+    }
+
+    .question-card[data-group] {
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .question-card.hidden {
+      display: none;
+    }
+
+    .rapid-columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .flash-card {
+      padding: 1rem;
+      background: linear-gradient(180deg, rgba(255,253,248,0.94), rgba(246,239,224,0.94));
+    }
+
+    .flash-card ol,
+    .flash-card ul {
+      margin-top: 0.6rem;
+    }
+
+    .quick-only {
+      display: block;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 0.5rem 0 2rem;
+    }
+
+    @media (max-width: 1180px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .hero-grid,
+      .case-grid,
+      .two-col,
+      .role-grid,
+      .metrics,
+      .tri-col,
+      .arch-grid,
+      .rapid-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .workflow-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .step-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .agent-row,
+      .agent-row.center {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: none;
+      }
+
+      .aws-meta-strip,
+      .aws-flow,
+      .aws-route-strip,
+      .aws-spoken-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .loop-board {
+        min-height: 980px;
+      }
+
+      .loop-center {
+        position: static;
+        transform: none;
+        width: 100%;
+        max-width: none;
+        margin: 0 0 1rem;
+      }
+
+      .loop-node {
+        position: static;
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        transform: none !important;
+        margin-bottom: 0.85rem;
+      }
+
+      .loop-svg {
+        display: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        padding: 0.65rem;
+      }
+
+      .hero,
+      .panel {
+        padding: 1rem;
+        border-radius: 20px;
+      }
+
+      .nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .workflow-grid,
+      .micro-grid,
+      .agent-row,
+      .agent-row.center,
+      .step-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+    }
+
+    @keyframes heartbeat-dot {
+      0% { box-shadow: 0 0 0 0 rgba(13,122,108,0.55); transform: scale(1); }
+      55% { box-shadow: 0 0 0 10px rgba(13,122,108,0); transform: scale(1.2); }
+      100% { box-shadow: 0 0 0 0 rgba(13,122,108,0); transform: scale(1); }
+    }
+
+    @keyframes heartbeat-node {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 currentColor; opacity: 0.65; }
+      35% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(0,0,0,0); opacity: 0.9; }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0,0,0,0); opacity: 0.65; }
+    }
+
+    @keyframes heartbeat-line {
+      0% { background-position: 200% 0; opacity: 0.45; }
+      50% { opacity: 0.9; }
+      100% { background-position: -20% 0; opacity: 0.45; }
+    }
+
+    @keyframes heartbeat-ring {
+      0% { transform: scale(0.98); opacity: 0.55; }
+      70% { transform: scale(1.05); opacity: 0; }
+      100% { transform: scale(1.08); opacity: 0; }
+    }
+
+    @keyframes heartbeat-stroke {
+      0% { stroke-dashoffset: 0; opacity: 0.42; }
+      50% { opacity: 0.9; }
+      100% { stroke-dashoffset: -90; opacity: 0.42; }
+    }
+
+    @keyframes heartbeat-pulse {
+      0% { transform: translate(90px, 92px) scale(0.9); opacity: 0; }
+      8% { opacity: 1; }
+      18% { transform: translate(467px, 92px) scale(1.05); }
+      30% { transform: translate(640px, 235px) scale(0.95); }
+      42% { transform: translate(640px, 477px) scale(1.08); }
+      54% { transform: translate(467px, 620px) scale(0.95); }
+      66% { transform: translate(90px, 620px) scale(1.05); }
+      78% { transform: translate(36px, 477px) scale(0.95); }
+      90% { transform: translate(36px, 235px) scale(1.02); opacity: 1; }
+      100% { transform: translate(90px, 92px) scale(0.9); opacity: 0; }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .shell {
+        display: block;
+        max-width: none;
+        padding: 0;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .panel,
+      .hero {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        break-inside: avoid;
+        background: white;
+        color: black;
+      }
+
+      .toggle-row {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="eyebrow">Interview War Room</span>
+        <h1>PwC Round 2 Prep</h1>
+        <p>Offline, sanitized, deep technical prep platform built around a real production workflow pattern.</p>
+      </div>
+
+      <nav class="nav" aria-label="Section navigation">
+        <a href="#mission">Mission</a>
+        <a href="#role-decoder">Role Decoder</a>
+        <a href="#case-study">Case Study</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#agent-blueprint">Agent Blueprint</a>
+        <a href="#langgraph-mcp">LangGraph + MCP</a>
+        <a href="#aws-architecture">AWS Architecture</a>
+        <a href="#explain-it">Explain It</a>
+        <a href="#production-grade">Production Grade</a>
+        <a href="#tough-questions">Question Bank</a>
+        <a href="#your-story">Your Story</a>
+        <a href="#rapid-revision">Rapid Revision</a>
+      </nav>
+
+      <div class="sidebar-note">
+        <strong>Safe interview framing:</strong> describe this as a generic freight document intelligence platform inspired by real production work. Never mention internal company names, secrets, URLs, or proprietary identifiers.
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <span class="eyebrow" style="background: rgba(255,255,255,0.16); color: white;">Final Round Focus</span>
+            <h1>Freight Document Intelligence &amp; Review Copilot</h1>
+            <p>
+              Use this page to explain a production-grade AI workflow like an engineer, not a prompt hobbyist. The story is intentionally bounded, auditable, and operations-aware: intake, validation, OCR fallback, model routing, structured extraction, deterministic controls, human review, feedback loop, and release readiness.
+            </p>
+            <p class="quick-only">
+              Backup line: <strong>I build reliable Python and AI workflows that turn messy operational documents into governed, reviewable systems.</strong>
+            </p>
+          </div>
+          <div class="hero-cards">
+            <div class="hero-card">
+              <strong>What round 2 is testing</strong>
+              Depth, judgment, production thinking, and whether you can explain tradeoffs calmly.
+            </div>
+            <div class="hero-card">
+              <strong>Your safest positioning</strong>
+              Backend-first applied AI engineer who operationalizes workflows, not just demos prompts.
+            </div>
+            <div class="hero-card">
+              <strong>Core answer pattern</strong>
+              Problem -> design choice -> tradeoff -> risk control -> enterprise value.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="mission">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Mission Control</span>
+            <h2>What You Need To Win In 30 Minutes</h2>
+            <p class="section-kicker">Your goal is not to prove you know every framework. Your goal is to sound like a safe pair of hands for enterprise AI delivery.</p>
+          </div>
+          <div class="pill-row">
+            <span class="pill">Reliability</span>
+            <span class="pill">Governance</span>
+            <span class="pill">Production Depth</span>
+            <span class="pill">Clear Communication</span>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <strong>5 min</strong>
+            <span>Skim mode</span>
+            <p>Read the one-line positioning, 90-second answer, workflow map, and red flags section.</p>
+          </div>
+          <div class="metric">
+            <strong>15 min</strong>
+            <span>Rehearse mode</span>
+            <p>Cover role decoder, architecture subsystem tradeoffs, and 3 flagship stories.</p>
+          </div>
+          <div class="metric">
+            <strong>30 min</strong>
+            <span>Final prep</span>
+            <p>Run workflow, tough questions, failure handling, and release-readiness answers aloud.</p>
+          </div>
+          <div class="metric">
+            <strong>1 line</strong>
+            <span>Positioning</span>
+            <p><strong>I build reliable Python and AI workflows that turn messy operational documents into governed, reviewable systems.</strong></p>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top: 1rem;">
+          <div class="callout">
+            <span class="ribbon">Primary Positioning</span>
+            <p>I am a backend-first applied AI engineer with 5+ years of experience building Python services, workflow automation, retrieval-backed features, and production APIs. What makes me relevant for this role is that I think in terms of state, reviewability, failure handling, and operational reliability, not just LLM output quality.</p>
+          </div>
+          <div class="script">
+            <span class="ribbon">Backup Version</span>
+            <p>I’m strongest where AI meets backend systems: turning operational processes into reliable software workflows with APIs, structured outputs, human review, and production controls.</p>
+          </div>
+        </div>
+
+        <div class="tri-col" style="margin-top: 1rem;">
+          <div class="flash-card">
+            <h3>What interviewer is likely testing</h3>
+            <ul>
+              <li>Can you design an AI workflow beyond a single prompt call?</li>
+              <li>Do you understand production concerns like retries, state, review, tracing, and deployment?</li>
+              <li>Can you explain ambiguity and tradeoffs clearly?</li>
+            </ul>
+          </div>
+          <div class="flash-card">
+            <h3>What weak answers sound like</h3>
+            <ul>
+              <li>Too much focus on prompts instead of systems.</li>
+              <li>Buzzwords like agentic, autonomous, or multi-agent without control logic.</li>
+              <li>No story about failure, auditability, or human oversight.</li>
+            </ul>
+          </div>
+          <div class="flash-card">
+            <h3>What strong answers sound like</h3>
+            <ul>
+              <li>Bounded workflow with explicit state transitions.</li>
+              <li>Deterministic validation around LLM steps.</li>
+              <li>Clear routing between auto-approval, review, and escalation.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="role-decoder">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">PwC Role Decoder</span>
+            <h2>How The JD Converts Into Interview Lenses</h2>
+            <p class="section-kicker">Each lens below maps the job description into what the interviewer actually wants to hear, what to avoid, and how your background connects.</p>
+          </div>
+        </div>
+
+        <div class="role-grid">
+          <article class="lens-card">
+            <h3>1. Agentic Workflow Design</h3>
+            <p><strong>They want:</strong> bounded orchestration, explicit state, branching, retries, review gates.</p>
+            <p><strong>Weak answer:</strong> “The model reads the document and gives JSON.”</p>
+            <p><strong>Strong answer:</strong> “I model the workflow as intake, validation, extraction, post-processing, confidence routing, and human approval because enterprise systems need control more than autonomy.”</p>
+            <p><strong>Your fit:</strong> workflow automation, logistics operations, review-driven flows.</p>
+          </article>
+
+          <article class="lens-card">
+            <h3>2. LLM Orchestration</h3>
+            <p><strong>They want:</strong> model routing, prompt discipline, structured outputs, fallback logic.</p>
+            <p><strong>Weak answer:</strong> “I try different prompts until it works.”</p>
+            <p><strong>Strong answer:</strong> “I separate type detection, entity detection, and extraction tasks, and route text-heavy versus vision-heavy documents differently.”</p>
+            <p><strong>Your fit:</strong> extraction pipelines, LLM-integrated application features, retrieval-backed flows.</p>
+          </article>
+
+          <article class="lens-card">
+            <h3>3. Backend / API Engineering</h3>
+            <p><strong>They want:</strong> clean APIs, async or status-aware execution, validation, background work, error states.</p>
+            <p><strong>Weak answer:</strong> “There is an endpoint that uploads the file.”</p>
+            <p><strong>Strong answer:</strong> “The service supports both UI upload and API ingestion, tracks document status, returns structured responses, and exposes progress visibility.”</p>
+            <p><strong>Your fit:</strong> strong Python backend, REST APIs, automation services.</p>
+          </article>
+
+          <article class="lens-card">
+            <h3>4. Cloud-Native Deployment</h3>
+            <p><strong>They want:</strong> packaging, env-driven config, runtime stability, secure model access, health discipline.</p>
+            <p><strong>Weak answer:</strong> “I ran it on a server.”</p>
+            <p><strong>Strong answer:</strong> “I think in terms of environment separation, secrets, worker timeouts, request timeouts, deployment consistency, and observability.”</p>
+            <p><strong>Your fit:</strong> deployment exposure, production services, ops-aware engineering.</p>
+          </article>
+
+          <article class="lens-card">
+            <h3>5. State / Memory / Caching</h3>
+            <p><strong>They want:</strong> clear distinction between workflow state, cache, durable records, and retrieval.</p>
+            <p><strong>Weak answer:</strong> “Redis stores memory.”</p>
+            <p><strong>Strong answer:</strong> “Short-lived workflow state and progress belong in fast ephemeral storage; durable audit data belongs in a database; retrieval corpora belong elsewhere.”</p>
+            <p><strong>Your fit:</strong> status tracking, extracted data storage, workflow routing logic.</p>
+          </article>
+
+          <article class="lens-card">
+            <h3>6. Guardrails / Observability / Evaluation</h3>
+            <p><strong>They want:</strong> low-hallucination behavior, traceability, pre-release confidence.</p>
+            <p><strong>Weak answer:</strong> “We trust the model and then fix mistakes later.”</p>
+            <p><strong>Strong answer:</strong> “I combine validation, deterministic rules, review queues, event logging, and structured outputs so the workflow is inspectable and governable.”</p>
+            <p><strong>Your fit:</strong> human-in-the-loop review, correctness-sensitive document extraction, operational feedback loops.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="case-study">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Flagship Example</span>
+            <h2>Case Study: Freight Document Intelligence &amp; Review Copilot</h2>
+            <p class="section-kicker">This is the sanitized, interview-safe way to talk about your recent production work without exposing internal details.</p>
+          </div>
+          <div class="pill-row">
+            <span class="pill">Genericized</span>
+            <span class="pill">Interview Safe</span>
+            <span class="pill">Production Grounded</span>
+          </div>
+        </div>
+
+        <div class="case-grid">
+          <div class="story-card">
+            <h3>Business Problem</h3>
+            <p>Freight and operations teams receive high volumes of PDFs like rate confirmations, bills of lading, proof of delivery, and maintenance records. Manual extraction is slow, inconsistent, and hard to audit. Different document formats, scanned images, and noisy inputs make automation brittle.</p>
+            <h3 style="margin-top: 1rem;">System Goal</h3>
+            <p>Automate structured extraction while preserving human control, traceability, and operational safety. The system should reduce manual work for known patterns, but never hide uncertainty.</p>
+            <h3 style="margin-top: 1rem;">Users</h3>
+            <ul>
+              <li>Operations users uploading or submitting documents</li>
+              <li>Human reviewers correcting or approving extractions</li>
+              <li>Admins controlling approval policy</li>
+              <li>Partner systems consuming structured JSON through APIs</li>
+            </ul>
+          </div>
+
+          <div class="story-card">
+            <h3>Inputs</h3>
+            <ul>
+              <li>Web UI uploads for operations users</li>
+              <li>Public API ingestion for partner systems</li>
+              <li>Document-type hints when available, but not required</li>
+            </ul>
+            <h3 style="margin-top: 1rem;">Outputs</h3>
+            <ul>
+              <li>Structured JSON payloads</li>
+              <li>Confidence and status metadata</li>
+              <li>Review tasks and approval states</li>
+              <li>Progress events for UI or streaming clients</li>
+              <li>Feedback traces for future improvement</li>
+            </ul>
+            <div class="safety-box" style="margin-top: 1rem;">
+              <span class="ribbon">Interview Safety</span>
+              <p>Describe vendors as “text model path”, “vision model path”, or “managed model provider.” Do not expose company names, keys, exact URLs, or live infrastructure details.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top: 1rem;">
+          <div class="legend-box">
+            <span class="ribbon">Why this example is strong</span>
+            <ul>
+              <li>It is AI plus backend plus operations, which matches the PwC role.</li>
+              <li>It naturally demonstrates state, routing, guardrails, and human-in-the-loop.</li>
+              <li>It is concrete enough to discuss tradeoffs and production risk honestly.</li>
+            </ul>
+          </div>
+          <div class="callout">
+            <span class="ribbon">How to introduce it</span>
+            <p>One of the most relevant systems I worked on was a freight document intelligence workflow that automated extraction from multiple logistics document types, routed uncertain cases into human review, and supported both UI and API ingestion. What makes it useful for this discussion is that it forced us to balance LLM flexibility with production controls and auditability.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="workflow">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">End-To-End Workflow</span>
+            <h2>Production Workflow Infographic</h2>
+            <p class="section-kicker">Memorize the shape, not just the words. The four colored lanes help you remember where each concern lives.</p>
+          </div>
+        </div>
+
+        <div class="lane-legend">
+          <span class="lane intake">Intake</span>
+          <span class="lane reasoning">Reasoning</span>
+          <span class="lane control">Control</span>
+          <span class="lane ops">Operations</span>
+        </div>
+
+        <div class="workflow-grid">
+          <article class="workflow-card intake" data-phase="intake">
+            <span class="step">1. Intake</span>
+            <h3>UI or API receives the PDF</h3>
+            <p><strong>What:</strong> accept upload, validate file shape, create document row, assign identifiers.</p>
+            <p><strong>Why:</strong> every workflow needs a durable unit of work.</p>
+            <p><strong>Failure mode:</strong> empty file, bad type, duplicate replay, oversized payload.</p>
+            <p><strong>One-liner:</strong> “I start by converting the file into a tracked workflow object with status and audit fields.”</p>
+          </article>
+
+          <article class="workflow-card intake" data-phase="intake">
+            <span class="step">2. Validation</span>
+            <h3>Basic file and format checks</h3>
+            <p><strong>What:</strong> ensure PDF is readable and structurally acceptable.</p>
+            <p><strong>Why:</strong> fail fast before expensive AI calls.</p>
+            <p><strong>Failure mode:</strong> malformed PDFs or unsupported inputs.</p>
+            <p><strong>One-liner:</strong> “I use cheap deterministic checks before model invocation.”</p>
+          </article>
+
+          <article class="workflow-card reasoning" data-phase="reasoning">
+            <span class="step">3. Text Extraction</span>
+            <h3>Primary PDF text extraction</h3>
+            <p><strong>What:</strong> extract text using standard PDF libraries.</p>
+            <p><strong>Why:</strong> text-first is cheaper and often more reliable for machine-generated docs.</p>
+            <p><strong>Failure mode:</strong> scanned image PDFs return little or no usable text.</p>
+            <p><strong>One-liner:</strong> “Text-first keeps latency and cost lower for well-formed documents.”</p>
+          </article>
+
+          <article class="workflow-card reasoning" data-phase="reasoning">
+            <span class="step">4. OCR Fallback</span>
+            <h3>Recover content from scanned docs</h3>
+            <p><strong>What:</strong> OCR local fallback plus rendered page images for vision processing.</p>
+            <p><strong>Why:</strong> scanned operational PDFs are common in the real world.</p>
+            <p><strong>Failure mode:</strong> noisy OCR, missing fields, image quality issues.</p>
+            <p><strong>One-liner:</strong> “If text extraction is weak, the workflow pivots rather than failing blindly.”</p>
+          </article>
+
+          <article class="workflow-card reasoning" data-phase="reasoning">
+            <span class="step">5. Type Detection</span>
+            <h3>Heuristic + model-based document classification</h3>
+            <p><strong>What:</strong> combine keyword heuristics with LLM-based type detection.</p>
+            <p><strong>Why:</strong> one source can be wrong; combined signals reduce misrouting.</p>
+            <p><strong>Failure mode:</strong> ambiguous docs or weak text leading to wrong schema path.</p>
+            <p><strong>One-liner:</strong> “I classify early so extraction uses the right schema and model path.”</p>
+          </article>
+
+          <article class="workflow-card reasoning" data-phase="reasoning">
+            <span class="step">6. Entity Detection</span>
+            <h3>Identify company or issuing party</h3>
+            <p><strong>What:</strong> extract the likely company name or issuing entity.</p>
+            <p><strong>Why:</strong> company policy affects prompt choice and approval routing.</p>
+            <p><strong>Failure mode:</strong> ambiguous headers or missing issuer data.</p>
+            <p><strong>One-liner:</strong> “Entity detection matters because policy and trust are document-source aware.”</p>
+          </article>
+
+          <article class="workflow-card reasoning" data-phase="reasoning">
+            <span class="step">7. Model Routing</span>
+            <h3>Choose text or vision extraction path</h3>
+            <p><strong>What:</strong> route text-heavy documents differently from vision-heavy ones.</p>
+            <p><strong>Why:</strong> model specialization improves reliability and efficiency.</p>
+            <p><strong>Failure mode:</strong> wrong model family causing poor extraction quality.</p>
+            <p><strong>One-liner:</strong> “I don’t treat model selection as static; I treat it as workflow policy.”</p>
+          </article>
+
+          <article class="workflow-card reasoning" data-phase="reasoning">
+            <span class="step">8. Structured Extraction</span>
+            <h3>Generate schema-shaped JSON</h3>
+            <p><strong>What:</strong> extract document fields into a fixed structure.</p>
+            <p><strong>Why:</strong> downstream systems need predictable outputs, not free text.</p>
+            <p><strong>Failure mode:</strong> missing keys, malformed JSON, field hallucination.</p>
+            <p><strong>One-liner:</strong> “Structured output is essential because business systems consume contracts, not prose.”</p>
+          </article>
+
+          <article class="workflow-card control" data-phase="control">
+            <span class="step">9. Deterministic Normalization</span>
+            <h3>Apply business rules after LLM output</h3>
+            <p><strong>What:</strong> normalize stop types, clean strings, enforce rule-based corrections in narrow cases.</p>
+            <p><strong>Why:</strong> LLM output needs deterministic cleanup before trust.</p>
+            <p><strong>Failure mode:</strong> silent acceptance of structurally wrong but plausible output.</p>
+            <p><strong>One-liner:</strong> “I wrap the model with business rules so the workflow is not purely probabilistic.”</p>
+          </article>
+
+          <article class="workflow-card control" data-phase="control">
+            <span class="step">10. Confidence Scoring</span>
+            <h3>Decide how much trust the system has</h3>
+            <p><strong>What:</strong> derive a confidence score or confidence band for routing.</p>
+            <p><strong>Why:</strong> uncertainty should change workflow behavior, not be ignored.</p>
+            <p><strong>Failure mode:</strong> overconfidence leading to unsafe auto-approval.</p>
+            <p><strong>One-liner:</strong> “Confidence is useful only if it changes the control path.”</p>
+          </article>
+
+          <article class="workflow-card control" data-phase="control">
+            <span class="step">11. Approval Policy Check</span>
+            <h3>Known entity vs unknown entity</h3>
+            <p><strong>What:</strong> check whether the company or pattern is previously approved.</p>
+            <p><strong>Why:</strong> trusted sources can move faster with lower human overhead.</p>
+            <p><strong>Failure mode:</strong> wrong entity match causing misplaced trust.</p>
+            <p><strong>One-liner:</strong> “Known-good patterns can be fast-pathed, but only behind policy controls.”</p>
+          </article>
+
+          <article class="workflow-card control" data-phase="control">
+            <span class="step">12. Auto-Approve vs Review</span>
+            <h3>Route to low-friction or human oversight</h3>
+            <p><strong>What:</strong> approved companies and high-confidence docs may auto-complete; others go to review.</p>
+            <p><strong>Why:</strong> balance throughput and correctness.</p>
+            <p><strong>Failure mode:</strong> incorrect trust rules increasing operational risk.</p>
+            <p><strong>One-liner:</strong> “The system is designed to surface uncertainty instead of hiding it.”</p>
+          </article>
+
+          <article class="workflow-card control" data-phase="control">
+            <span class="step">13. Reviewer Correction</span>
+            <h3>Approve, modify, or reject</h3>
+            <p><strong>What:</strong> human reviewers inspect side-by-side data and original document.</p>
+            <p><strong>Why:</strong> human-in-the-loop closes the gap between extraction and operational trust.</p>
+            <p><strong>Failure mode:</strong> poor reviewer UX or unclear error provenance.</p>
+            <p><strong>One-liner:</strong> “I designed review as a first-class workflow state, not as an exception.”</p>
+          </article>
+
+          <article class="workflow-card control" data-phase="control">
+            <span class="step">14. Admin Approval</span>
+            <h3>Higher-trust governance step</h3>
+            <p><strong>What:</strong> some outcomes or new entities need elevated approval.</p>
+            <p><strong>Why:</strong> it creates governance before new trust policies propagate.</p>
+            <p><strong>Failure mode:</strong> bottlenecks if policy thresholds are too strict.</p>
+            <p><strong>One-liner:</strong> “Approval is also a policy-management function, not just a quality check.”</p>
+          </article>
+
+          <article class="workflow-card ops" data-phase="ops">
+            <span class="step">15. Feedback Loop</span>
+            <h3>Capture corrections for improvement</h3>
+            <p><strong>What:</strong> store modifications, notes, and correction patterns.</p>
+            <p><strong>Why:</strong> production AI improves through observed error patterns, not intuition.</p>
+            <p><strong>Failure mode:</strong> collecting feedback without integrating it into evaluation.</p>
+            <p><strong>One-liner:</strong> “Reviewer edits become signal for prompt, schema, and policy refinement.”</p>
+          </article>
+
+          <article class="workflow-card ops" data-phase="ops">
+            <span class="step">16. Final Response</span>
+            <h3>Return JSON, status, and metadata</h3>
+            <p><strong>What:</strong> deliver approved or pending output to UI/API consumers.</p>
+            <p><strong>Why:</strong> clients need machine-consumable results plus workflow state.</p>
+            <p><strong>Failure mode:</strong> returning data without approval context.</p>
+            <p><strong>One-liner:</strong> “The response includes not just data, but the trust posture of that data.”</p>
+          </article>
+
+          <article class="workflow-card ops" data-phase="ops">
+            <span class="step">17. Tracing &amp; Analytics</span>
+            <h3>Observe the workflow end to end</h3>
+            <p><strong>What:</strong> emit processing events, log model path, token usage, statuses, and review outcomes.</p>
+            <p><strong>Why:</strong> debugging and release readiness depend on visibility.</p>
+            <p><strong>Failure mode:</strong> production failures with no step-level evidence.</p>
+            <p><strong>One-liner:</strong> “If I can’t trace it, I can’t safely operate or improve it.”</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="architecture">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Architecture Breakdown</span>
+            <h2>How To Present It As A Production System</h2>
+            <p class="section-kicker">Talk in subsystems. That makes you sound organized, production-minded, and credible under pressure.</p>
+          </div>
+        </div>
+
+        <div class="arch-grid">
+          <article class="arch-card">
+            <h3>Intake Layer</h3>
+            <div class="micro-grid">
+              <div class="micro-cell">
+                <strong>Responsibilities</strong>
+                Accept uploads or API requests, validate file shape, create document records, expose initial status.
+              </div>
+              <div class="micro-cell">
+                <strong>Implementation choices</strong>
+                REST endpoint or UI upload route, durable document table, file metadata, idempotent request handling.
+              </div>
+              <div class="micro-cell">
+                <strong>Reliability concerns</strong>
+                malformed files, replayed requests, size limits, upload storage failures.
+              </div>
+              <div class="micro-cell">
+                <strong>Interview tradeoff</strong>
+                Synchronous upload is fine; processing can still be asynchronous or status-driven underneath.
+              </div>
+            </div>
+          </article>
+
+          <article class="arch-card">
+            <h3>Orchestration Layer</h3>
+            <div class="micro-grid">
+              <div class="micro-cell">
+                <strong>Responsibilities</strong>
+                Manage step order, branching, status changes, retries, and escalation logic.
+              </div>
+              <div class="micro-cell">
+                <strong>Implementation choices</strong>
+                service function, task runner, or future graph orchestration framework like LangGraph.
+              </div>
+              <div class="micro-cell">
+                <strong>Reliability concerns</strong>
+                hidden branching, inconsistent statuses, poor error propagation.
+              </div>
+              <div class="micro-cell">
+                <strong>Interview tradeoff</strong>
+                A bounded orchestration function is already agentic enough if state and control logic are explicit.
+              </div>
+            </div>
+          </article>
+
+          <article class="arch-card">
+            <h3>Document Intelligence Layer</h3>
+            <div class="micro-grid">
+              <div class="micro-cell">
+                <strong>Responsibilities</strong>
+                text extraction, OCR fallback, type detection, entity detection, structured extraction.
+              </div>
+              <div class="micro-cell">
+                <strong>Implementation choices</strong>
+                text-first path, rendered page images for vision, task-specific prompts, schema-shaped extraction.
+              </div>
+              <div class="micro-cell">
+                <strong>Reliability concerns</strong>
+                scanned documents, ambiguous headers, hallucinated fields, schema drift.
+              </div>
+              <div class="micro-cell">
+                <strong>Interview tradeoff</strong>
+                using different model paths for different modalities is often better than one universal model.
+              </div>
+            </div>
+          </article>
+
+          <article class="arch-card">
+            <h3>Routing &amp; Policy Layer</h3>
+            <div class="micro-grid">
+              <div class="micro-cell">
+                <strong>Responsibilities</strong>
+                confidence routing, company approval checks, policy-based auto-approval, deterministic cleanup.
+              </div>
+              <div class="micro-cell">
+                <strong>Implementation choices</strong>
+                threshold bands, approved-entity fast path, rule-based normalization, allow-listed states.
+              </div>
+              <div class="micro-cell">
+                <strong>Reliability concerns</strong>
+                over-trusting confidence scores or entity matches.
+              </div>
+              <div class="micro-cell">
+                <strong>Interview tradeoff</strong>
+                production AI is strongest when probabilistic steps are surrounded by deterministic policy.
+              </div>
+            </div>
+          </article>
+
+          <article class="arch-card">
+            <h3>Review &amp; Approval Layer</h3>
+            <div class="micro-grid">
+              <div class="micro-cell">
+                <strong>Responsibilities</strong>
+                review queue, correction UI, rejection path, admin approval, audit notes.
+              </div>
+              <div class="micro-cell">
+                <strong>Implementation choices</strong>
+                role-based access, explicit statuses, saved reviewer modifications, review history.
+              </div>
+              <div class="micro-cell">
+                <strong>Reliability concerns</strong>
+                weak reviewer UX, poor visibility into why the model made an error.
+              </div>
+              <div class="micro-cell">
+                <strong>Interview tradeoff</strong>
+                human-in-the-loop is not a weakness; in enterprise it is often the strongest control.
+              </div>
+            </div>
+          </article>
+
+          <article class="arch-card">
+            <h3>Storage / State Layer</h3>
+            <div class="micro-grid">
+              <div class="micro-cell">
+                <strong>Responsibilities</strong>
+                document metadata, extracted payloads, statuses, review notes, token usage, feedback rows.
+              </div>
+              <div class="micro-cell">
+                <strong>Implementation choices</strong>
+                relational store for durable workflow records, future Redis for run state and caching.
+              </div>
+              <div class="micro-cell">
+                <strong>Reliability concerns</strong>
+                mixing transient state with authoritative audit data.
+              </div>
+              <div class="micro-cell">
+                <strong>Interview tradeoff</strong>
+                durable records belong in a DB; high-speed ephemeral state can move to Redis later.
+              </div>
+            </div>
+          </article>
+
+          <article class="arch-card">
+            <h3>Observability &amp; Ops Layer</h3>
+            <div class="micro-grid">
+              <div class="micro-cell">
+                <strong>Responsibilities</strong>
+                event streaming, logs, token tracking, model path visibility, failure diagnosis.
+              </div>
+              <div class="micro-cell">
+                <strong>Implementation choices</strong>
+                step-level progress events, structured logs, metrics, future Langfuse tracing.
+              </div>
+              <div class="micro-cell">
+                <strong>Reliability concerns</strong>
+                black-box failures and inability to debug quality regressions.
+              </div>
+              <div class="micro-cell">
+                <strong>Interview tradeoff</strong>
+                observability is part of the product, not an afterthought for ops.
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="two-col deep-only" style="margin-top: 1rem;">
+          <div class="callout">
+            <span class="ribbon">Why this is already agentic</span>
+            <p>This workflow uses AI as a decision-making and extraction component inside a stateful control system. The workflow branches based on validation, modality, entity trust, and review policy. That is closer to real enterprise agentic behavior than a flashy open-ended chatbot because it coordinates reasoning, policy, and action over multiple steps.</p>
+          </div>
+          <div class="script">
+            <span class="ribbon">How you can connect it to LangGraph</span>
+            <p>If asked how you would formalize it further, say that each major stage naturally maps to nodes in a graph: intake, detect type, detect entity, choose model path, extract, normalize, evaluate confidence, route to approval, and persist results. LangGraph would make retries, checkpointing, and branching more explicit, but the underlying design logic is already there.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="agent-blueprint">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Agent Blueprint</span>
+            <h2>What A Production-Grade AI Agent Actually Looks Like</h2>
+            <p class="section-kicker">In enterprise settings, an AI agent is rarely just a model with tools. It is a controlled workflow system with explicit components, operating rules, and feedback loops.</p>
+          </div>
+          <div class="pill-row">
+            <span class="pill">Stateful</span>
+            <span class="pill">Tool-Aware</span>
+            <span class="pill">Policy-Bounded</span>
+            <span class="pill">Observable</span>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="callout">
+            <span class="ribbon">Production Agent Anatomy</span>
+            <p>A production-grade AI agent usually has the same high-level anatomy no matter the domain: channel or trigger, orchestration state, model reasoning step, retrieval or context layer, tool layer, validation or evaluator step, approval policy, persistent storage, and tracing. The real difference between a demo and a production system is how much discipline exists around those layers.</p>
+          </div>
+          <div class="script">
+            <span class="ribbon">Best Interview Line</span>
+            <p>When I say production-grade agent, I mean a bounded workflow where the LLM is one component inside a larger controlled system that handles state, tools, validation, approvals, and observability.</p>
+          </div>
+        </div>
+
+        <div class="diagram-shell" style="margin-top: 1rem;">
+          <div class="diagram-head">
+            <div>
+              <h3>Illustration 1: AI Agent Component Map</h3>
+              <p>Read this top to bottom: trigger enters the system, reasoning chooses a path, tools and retrieval feed the model, validation protects the outcome, and tracing closes the operational loop.</p>
+            </div>
+            <span class="live-badge">Live heartbeat</span>
+          </div>
+          <div class="diagram-stage">
+            <div class="agent-map">
+              <div class="agent-row">
+                <article class="agent-node intake-node">
+                  <h4>Trigger / Channel</h4>
+                  <p>Chat, API, event, document upload, cron</p>
+                  <small>Starts the workflow and defines the ownership boundary.</small>
+                </article>
+                <article class="agent-node intake-node">
+                  <h4>Auth / Identity</h4>
+                  <p>SSO, API key, RBAC, tenant context</p>
+                  <small>Ensures the agent acts inside the right permissions and scope.</small>
+                </article>
+                <article class="agent-node reasoning-node">
+                  <h4>Orchestrator / State Graph</h4>
+                  <p>Workflow engine, graph, state machine</p>
+                  <small>Turns model calls into a controlled, resumable process.</small>
+                </article>
+                <article class="agent-node control-node">
+                  <h4>Pre-checks</h4>
+                  <p>Schema validation, dedupe, policy gate</p>
+                  <small>Filters cheap failures before expensive reasoning begins.</small>
+                </article>
+              </div>
+
+              <div class="agent-connector">state + routing</div>
+
+              <div class="agent-row center">
+                <article class="agent-node reasoning-node">
+                  <h4>Reasoning / Planning</h4>
+                  <p>Decide next step, output shape, tool need</p>
+                  <small>The planning layer gives the agent structure and direction.</small>
+                </article>
+                <article class="agent-node reasoning-node">
+                  <h4>Retrieval / Context</h4>
+                  <p>Policies, KB, SQL, history, records</p>
+                  <small>Grounds the agent in enterprise facts, not memory alone.</small>
+                </article>
+                <article class="agent-node control-node">
+                  <h4>Tool Router</h4>
+                  <p>Select OCR, CRM, ticketing, ERP, search</p>
+                  <small>Keeps action choices explicit and policy-bounded.</small>
+                </article>
+              </div>
+
+              <div class="agent-connector">context + action</div>
+
+              <div class="agent-row">
+                <article class="agent-node reasoning-node">
+                  <h4>LLM / Decision Engine</h4>
+                  <p>Classify, extract, summarize, decide</p>
+                  <small>The model reasons over assembled context and tool evidence.</small>
+                </article>
+                <article class="agent-node control-node">
+                  <h4>Validator / Guardrails</h4>
+                  <p>Schema, policy, confidence, safety checks</p>
+                  <small>Separates plausible output from acceptable enterprise output.</small>
+                </article>
+                <article class="agent-node control-node">
+                  <h4>Approval / Escalation</h4>
+                  <p>Human review, admin sign-off, fallback path</p>
+                  <small>Handles ambiguity and risk instead of hiding it.</small>
+                </article>
+                <article class="agent-node ops-node">
+                  <h4>State / Tracing / Eval</h4>
+                  <p>DB, Redis, logs, Langfuse, review feedback</p>
+                  <small>Makes the whole system auditable, debuggable, and improvable.</small>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <details open style="margin-top: 1rem;">
+          <summary>Illustrative Reference Pattern: Generic Enterprise Agent Loop</summary>
+          <p><strong>Trigger</strong> receives a task or document. <strong>Orchestrator</strong> initializes workflow state. <strong>Reasoning step</strong> classifies the task and chooses the next node. <strong>Retrieval layer</strong> pulls policies, prior records, or context. <strong>Tool layer</strong> performs allowed actions. <strong>Validator</strong> checks whether the result is complete and policy-safe. <strong>Approval logic</strong> decides whether to auto-complete or escalate. <strong>State and tracing</strong> capture every step for audit and evaluation.</p>
+          <p>The production insight is that the model is not the architecture. The architecture is the control system around the model.</p>
+        </details>
+
+        <div class="diagram-shell">
+          <div class="diagram-head">
+            <div>
+              <h3>Illustration 2: Enterprise Agent Control Loop</h3>
+              <p>This one shows how an enterprise agent stays alive operationally: every action loops back through validation, approval, tracing, and learning instead of ending at raw output.</p>
+            </div>
+            <span class="live-badge">Continuous loop</span>
+          </div>
+          <div class="diagram-stage">
+            <div class="loop-board">
+              <svg class="loop-svg" viewBox="0 0 700 710" preserveAspectRatio="none" aria-hidden="true">
+                <path class="loop-path" d="M110 105 L470 105 Q610 105 650 210 L650 500 Q650 605 510 605 L150 605 Q50 605 40 520 L40 230 Q40 130 110 105 Z"></path>
+                <circle class="loop-pulse" cx="0" cy="0" r="8"></circle>
+              </svg>
+
+              <article class="loop-center">
+                <h4>Bounded Enterprise Agent</h4>
+                <p>The model sits inside a live control loop of context, tools, validation, and governance.</p>
+              </article>
+
+              <article class="loop-node intake-node loop-top">
+                <h4>1. Trigger</h4>
+                <p>Task, alert, document, ticket, or API request</p>
+                <small>Defines the business event that starts the run.</small>
+              </article>
+
+              <article class="loop-node reasoning-node loop-top-right">
+                <h4>2. Orchestrate</h4>
+                <p>Create state, choose route, checkpoint progress</p>
+                <small>Keeps branching explicit instead of hidden in code.</small>
+              </article>
+
+              <article class="loop-node reasoning-node loop-right">
+                <h4>3. Retrieve &amp; Reason</h4>
+                <p>Pull policies, history, and facts before deciding</p>
+                <small>Grounding plus planning prevents shallow hallucinated actions.</small>
+              </article>
+
+              <article class="loop-node control-node loop-bottom-right">
+                <h4>4. Execute Tools</h4>
+                <p>Run OCR, CRM, ERP, search, ticketing, or workflow actions</p>
+                <small>The agent creates value when it can act safely in systems.</small>
+              </article>
+
+              <article class="loop-node control-node loop-bottom">
+                <h4>5. Validate &amp; Approve</h4>
+                <p>Schema checks, policy rules, confidence gates, human escalation</p>
+                <small>Enterprise trust is built here, not at the model layer alone.</small>
+              </article>
+
+              <article class="loop-node ops-node loop-bottom-left">
+                <h4>6. Persist Outcome</h4>
+                <p>Store result, status, audit notes, side effects</p>
+                <small>Durable records let teams inspect exactly what happened.</small>
+              </article>
+
+              <article class="loop-node ops-node loop-left">
+                <h4>7. Trace &amp; Observe</h4>
+                <p>Record tokens, latency, tool calls, errors, review edits</p>
+                <small>If you cannot trace it, you cannot operate it safely.</small>
+              </article>
+
+              <article class="loop-node reasoning-node loop-top-left">
+                <h4>8. Learn &amp; Improve</h4>
+                <p>Use feedback for evaluation, tuning, and policy updates</p>
+                <small>The loop closes only when reviewer signal improves future runs.</small>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin-top: 1.25rem;">
+          <div>
+            <span class="eyebrow">10 Enterprise Patterns</span>
+            <h2>Useful AI Agent Workflows You Can Cite In Interviews</h2>
+            <p class="section-kicker">These are standard market-relevant patterns. If asked for examples beyond your own project, pick one or two and explain them with the same component language.</p>
+          </div>
+        </div>
+
+        <div class="mini-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+          <article class="play-card">
+            <h3>1. Document Intelligence &amp; Review Copilot</h3>
+            <p><strong>Use case:</strong> invoices, claims, freight docs, contracts, compliance forms.</p>
+            <p><strong>Workflow:</strong> intake -> OCR/retrieval -> classify -> extract -> validate -> approve or review.</p>
+            <p><strong>Core components:</strong> document parser, model router, schema validator, reviewer UI, audit store.</p>
+            <p><strong>Why market-relevant:</strong> almost every enterprise has document-heavy workflows with high manual cost.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>2. Customer Support Resolution Agent</h3>
+            <p><strong>Use case:</strong> resolve support tickets using knowledge base and internal tools.</p>
+            <p><strong>Workflow:</strong> ticket arrives -> classify intent -> retrieve KB -> call account/order tools -> draft answer -> escalate if high risk.</p>
+            <p><strong>Core components:</strong> channel adapter, retriever, CRM/order tools, policy guardrails, escalation routing.</p>
+            <p><strong>Why market-relevant:</strong> direct impact on support throughput, resolution time, and consistency.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>3. IT Incident Triage Agent</h3>
+            <p><strong>Use case:</strong> analyze alerts, logs, and tickets for initial incident response.</p>
+            <p><strong>Workflow:</strong> alert trigger -> gather logs/metrics -> correlate services -> propose root cause -> run safe diagnostics -> escalate.</p>
+            <p><strong>Core components:</strong> event trigger, observability tools, service graph context, runbook retriever, approval gate for sensitive actions.</p>
+            <p><strong>Why market-relevant:</strong> strong fit for managed services and SRE-style operations.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>4. Procurement Compliance Agent</h3>
+            <p><strong>Use case:</strong> check purchase requests against vendor policy, budgets, and contract terms.</p>
+            <p><strong>Workflow:</strong> request intake -> retrieve policy -> compare vendor/budget -> flag exceptions -> route for approval.</p>
+            <p><strong>Core components:</strong> policy retriever, finance/ERP tool access, validation rules, approval workflow, audit trail.</p>
+            <p><strong>Why market-relevant:</strong> enterprises need controlled automation in approvals and spend governance.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>5. Contract Review &amp; Obligation Extraction Agent</h3>
+            <p><strong>Use case:</strong> review legal agreements for clauses, risks, and obligations.</p>
+            <p><strong>Workflow:</strong> upload contract -> chunk/retrieve clause library -> extract terms -> compare to policy -> highlight risk -> send to legal reviewer.</p>
+            <p><strong>Core components:</strong> document pipeline, retrieval, clause taxonomy, structured extractor, red-flag validator.</p>
+            <p><strong>Why market-relevant:</strong> high-value case study for enterprise AI governance and review workflows.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>6. KYC / Onboarding Verification Agent</h3>
+            <p><strong>Use case:</strong> customer onboarding, identity document review, sanctions/policy checks.</p>
+            <p><strong>Workflow:</strong> intake customer docs -> extract identifiers -> cross-check watchlists/policies -> compute risk band -> escalate to analyst.</p>
+            <p><strong>Core components:</strong> OCR, entity extraction, sanctions tool integrations, risk policy engine, analyst queue.</p>
+            <p><strong>Why market-relevant:</strong> ideal example of human-in-the-loop plus regulated AI operations.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>7. Revenue Operations Agent</h3>
+            <p><strong>Use case:</strong> qualify leads, enrich accounts, summarize opportunities, update CRM.</p>
+            <p><strong>Workflow:</strong> trigger from new lead -> enrich via internal/external data -> summarize account -> recommend next action -> update CRM with review controls.</p>
+            <p><strong>Core components:</strong> CRM tools, enrichment APIs, summarizer, validator for field updates, human review for high-impact actions.</p>
+            <p><strong>Why market-relevant:</strong> strong business value and easy cross-functional narrative.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>8. Claims Triage &amp; Adjudication Assistant</h3>
+            <p><strong>Use case:</strong> insurance or operations claims classification and evidence gathering.</p>
+            <p><strong>Workflow:</strong> claim intake -> collect documents -> extract facts -> compare to policy -> score completeness/risk -> recommend next step.</p>
+            <p><strong>Core components:</strong> document tools, policy retriever, decision rules, evidence validator, escalation workflow.</p>
+            <p><strong>Why market-relevant:</strong> combines documents, reasoning, compliance, and human approval in one pattern.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>9. Supply Chain Exception Agent</h3>
+            <p><strong>Use case:</strong> detect and respond to shipment delays, inventory anomalies, or vendor disruptions.</p>
+            <p><strong>Workflow:</strong> event trigger -> gather shipment/order context -> classify exception -> query tools -> recommend action or notify ops.</p>
+            <p><strong>Core components:</strong> event bus, ERP/TMS tools, routing logic, notification tools, decision log.</p>
+            <p><strong>Why market-relevant:</strong> highly relevant to logistics, operations, and managed-services delivery.</p>
+          </article>
+
+          <article class="play-card">
+            <h3>10. Knowledge-Grounded Internal Service Desk Agent</h3>
+            <p><strong>Use case:</strong> employee helpdesk for HR, IT, access requests, and internal operations questions.</p>
+            <p><strong>Workflow:</strong> employee question -> retrieve internal policy -> answer or fill action form -> create ticket -> escalate if sensitive.</p>
+            <p><strong>Core components:</strong> RAG layer, service catalog tools, ticketing integration, permission guardrails, feedback loop.</p>
+            <p><strong>Why market-relevant:</strong> very common enterprise adoption path and easy to explain as a managed service.</p>
+          </article>
+        </div>
+
+        <details class="deep-only" style="margin-top: 1rem;">
+          <summary>How To Explain The Core Components Across All 10 Patterns</summary>
+          <p><strong>Orchestrator:</strong> keeps the workflow stateful and controls branching. <strong>Retriever:</strong> grounds the model in enterprise facts. <strong>Tool layer:</strong> lets the agent act on systems, not just answer questions. <strong>Validator:</strong> checks whether outputs are safe, complete, and policy-compliant. <strong>Approval layer:</strong> routes high-risk outcomes to humans. <strong>State and tracing:</strong> make the workflow auditable and operable.</p>
+          <p>If the interviewer asks what changes between these agents, the answer is: the domain-specific tools, retrieval corpus, and approval policies change; the core production architecture remains surprisingly similar.</p>
+        </details>
+
+        <div class="two-col deep-only" style="margin-top: 1rem;">
+          <div class="legend-box">
+            <span class="ribbon">What interviewer hears</span>
+            <p>You understand that enterprise AI agents are reusable workflow patterns, not just isolated demos. You can abstract across use cases while still speaking concretely about implementation.</p>
+          </div>
+          <div class="callout">
+            <span class="ribbon">Best practical summary</span>
+            <p>The marketable enterprise agent pattern is: grounded reasoning + tool execution + policy validation + human escalation + observability. Once you can explain that pattern clearly, you can discuss many domains without sounding vague.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="langgraph-mcp">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">LangGraph + MCP</span>
+            <h2>How To Build This Pattern Using LangGraph And MCP</h2>
+            <p class="section-kicker">Use this section when the interviewer asks how you would implement the enterprise agent cleanly. The short answer is: LangGraph manages workflow state and branching, while MCP standardizes the tools the graph can call.</p>
+          </div>
+          <div class="pill-row">
+            <span class="pill">LangGraph = Orchestration</span>
+            <span class="pill">MCP = Tool Interface</span>
+            <span class="pill">LLM = Reasoning</span>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="callout">
+            <span class="ribbon">What LangGraph Does</span>
+            <p>LangGraph is the workflow brain. It stores state, runs nodes, branches conditionally, supports retries and checkpoints, and makes human approval steps explicit. In this document workflow, nodes might be: validate input, classify document, fetch policy, extract data, validate output, route to approve or review, and persist results.</p>
+          </div>
+          <div class="script">
+            <span class="ribbon">What MCP Does</span>
+            <p>MCP sits at the tool layer. It gives the agent a standard way to call capabilities such as document classification, policy lookup, review task creation, OCR, CRM lookup, or ERP actions. LangGraph decides when to call a tool; MCP standardizes how the tool is exposed.</p>
+          </div>
+        </div>
+
+        <div class="step-strip">
+          <div class="step-pill">
+            <strong>1. LangGraph node</strong>
+            Validate, classify, extract, evaluate, approve, persist.
+          </div>
+          <div class="step-pill">
+            <strong>2. MCP tool</strong>
+            Expose narrow enterprise capabilities like policy lookup or review-task creation.
+          </div>
+          <div class="step-pill">
+            <strong>3. State</strong>
+            Carry document ID, customer ID, raw text, extracted data, confidence, review reason.
+          </div>
+          <div class="step-pill">
+            <strong>4. Routing</strong>
+            Use state and policy to decide auto-approve vs review-required.
+          </div>
+        </div>
+
+        <details open style="margin-top: 1rem;">
+          <summary>Best Interview Explanation</summary>
+          <p>For an enterprise agent like this, I would use LangGraph to model the workflow as a state graph and MCP to expose enterprise tools in a standard way. LangGraph would control the nodes for classification, policy lookup, extraction, validation, and approval routing. MCP would expose tools like <span class="mono">classify_document</span>, <span class="mono">get_customer_policy</span>, and <span class="mono">create_review_task</span>. That separation keeps the orchestration clean and the tool layer reusable.</p>
+        </details>
+
+        <div class="code-card" style="margin-top: 1rem;">
+          <div class="code-head">
+            <div>
+              <strong>Example 1: MCP Server</strong>
+              <span>Exposes enterprise tools to the agent</span>
+            </div>
+            <span class="pill">mcp_server.py</span>
+          </div>
+          <div class="code-body">
+<pre><code>from datetime import datetime
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Ops Document Tools", json_response=True)
+
+REVIEW_TASKS: list[dict] = []
+
+CUSTOMER_POLICIES = {
+    "ACME_LOGISTICS": {
+        "customer_id": "ACME_LOGISTICS",
+        "trusted": True,
+        "auto_approve_threshold": 0.92,
+        "requires_human_review_for_new_doc_types": False,
+    },
+    "NEW_VENDOR": {
+        "customer_id": "NEW_VENDOR",
+        "trusted": False,
+        "auto_approve_threshold": 0.99,
+        "requires_human_review_for_new_doc_types": True,
+    },
+}
+
+@mcp.tool()
+def classify_document(text: str) -&gt; dict:
+    """Classify a logistics document from raw text."""
+    lower = text.lower()
+
+    if "rate confirmation" in lower or "rate con" in lower:
+        doc_type = "rate_confirmation"
+    elif "bill of lading" in lower or "bol" in lower:
+        doc_type = "bol"
+    elif "proof of delivery" in lower or "pod" in lower:
+        doc_type = "pod"
+    else:
+        doc_type = "unknown"
+
+    return {"status": "ok", "document_type": doc_type}
+
+@mcp.tool()
+def get_customer_policy(customer_id: str) -&gt; dict:
+    """Fetch approval policy for a customer."""
+    policy = CUSTOMER_POLICIES.get(
+        customer_id,
+        {
+            "customer_id": customer_id,
+            "trusted": False,
+            "auto_approve_threshold": 0.97,
+            "requires_human_review_for_new_doc_types": True,
+        },
+    )
+    return {"status": "ok", "policy": policy}
+
+@mcp.tool()
+def create_review_task(document_id: str, reason: str, extracted_data: dict) -&gt; dict:
+    """Create a human review task for uncertain outputs."""
+    task = {
+        "task_id": f"review-{len(REVIEW_TASKS) + 1:04d}",
+        "document_id": document_id,
+        "reason": reason,
+        "status": "queued",
+        "created_at": datetime.utcnow().isoformat() + "Z",
+        "snapshot": extracted_data,
+    }
+    REVIEW_TASKS.append(task)
+    return {"status": "ok", "task": task}
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")
+</code></pre>
+          </div>
+        </div>
+
+        <div class="code-card">
+          <div class="code-head">
+            <div>
+              <strong>Example 2: LangGraph Workflow</strong>
+              <span>State graph that calls MCP tools and routes by policy</span>
+            </div>
+            <span class="pill">langgraph_agent.py</span>
+          </div>
+          <div class="code-body">
+<pre><code>import asyncio
+from typing import Any, Literal
+from typing_extensions import TypedDict
+
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_openai import ChatOpenAI
+
+from mcp.client.session import ClientSession
+from mcp.client.stdio import stdio_client
+
+class AgentState(TypedDict, total=False):
+    document_id: str
+    customer_id: str
+    raw_text: str
+    document_type: str
+    customer_policy: dict[str, Any]
+    extracted_data: dict[str, Any]
+    confidence: float
+    validation_passed: bool
+    review_reason: str
+    review_task: dict[str, Any]
+    final_status: str
+    final_output: dict[str, Any]
+
+class MCPToolClient:
+    def __init__(self, command: str = "python", args: list[str] | None = None):
+        self.command = command
+        self.args = args or ["mcp_server.py"]
+        self._stdio_ctx = None
+        self._session_ctx = None
+        self.session: ClientSession | None = None
+
+    async def __aenter__(self):
+        self._stdio_ctx = stdio_client(command=self.command, args=self.args)
+        read, write = await self._stdio_ctx.__aenter__()
+        self._session_ctx = ClientSession(read, write)
+        self.session = await self._session_ctx.__aenter__()
+        await self.session.initialize()
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        if self._session_ctx:
+            await self._session_ctx.__aexit__(exc_type, exc, tb)
+        if self._stdio_ctx:
+            await self._stdio_ctx.__aexit__(exc_type, exc, tb)
+
+    async def call_tool(self, name: str, arguments: dict[str, Any]) -&gt; dict[str, Any]:
+        assert self.session is not None
+        result = await self.session.call_tool(name, arguments)
+        structured = getattr(result, "structuredContent", None)
+        if structured:
+            return structured
+        return {"status": "ok"}
+
+llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
+
+async def classify_document_node(state: AgentState) -&gt; dict[str, Any]:
+    async with MCPToolClient() as mcp:
+        result = await mcp.call_tool("classify_document", {"text": state["raw_text"]})
+    return {"document_type": result["document_type"]}
+
+async def get_policy_node(state: AgentState) -&gt; dict[str, Any]:
+    async with MCPToolClient() as mcp:
+        result = await mcp.call_tool("get_customer_policy", {"customer_id": state["customer_id"]})
+    return {"customer_policy": result["policy"]}
+
+async def extract_data_node(state: AgentState) -&gt; dict[str, Any]:
+    prompt = f"""
+Extract structured data from this logistics document.
+Document type: {state["document_type"]}
+Text:
+{state["raw_text"]}
+
+Return fields for:
+- customer_name
+- reference_number
+- total_amount
+- notes
+Only use values present in the source.
+"""
+    response = await llm.ainvoke(prompt)
+    extracted = {
+        "raw_model_output": response.content,
+        "customer_name": state["customer_id"],
+        "reference_number": "REF-DEMO-001",
+        "total_amount": 1200,
+        "notes": "Illustrative extraction",
+    }
+    confidence = 0.95 if state["document_type"] == "rate_confirmation" else 0.82
+    return {"extracted_data": extracted, "confidence": confidence}
+
+def validate_output_node(state: AgentState) -&gt; dict[str, Any]:
+    extracted = state["extracted_data"]
+    confidence = state["confidence"]
+    required_fields = ["customer_name", "reference_number", "total_amount"]
+    missing = [field for field in required_fields if not extracted.get(field)]
+    validation_passed = len(missing) == 0
+    review_reason = ""
+
+    if not validation_passed:
+        review_reason = f"Missing required fields: {missing}"
+    elif confidence &lt; 0.90:
+        review_reason = f"Confidence too low: {confidence}"
+
+    return {"validation_passed": validation_passed, "review_reason": review_reason}
+
+def route_after_validation(state: AgentState) -&gt; Literal["approve_node", "review_node"]:
+    policy = state["customer_policy"]
+    confidence = state["confidence"]
+
+    if not state["validation_passed"]:
+        return "review_node"
+    if not policy["trusted"]:
+        return "review_node"
+    if confidence &lt; policy["auto_approve_threshold"]:
+        return "review_node"
+    return "approve_node"
+
+def approve_node(state: AgentState) -&gt; dict[str, Any]:
+    return {
+        "final_status": "approved",
+        "final_output": {
+            "status": "approved",
+            "document_id": state["document_id"],
+            "document_type": state["document_type"],
+            "data": state["extracted_data"],
+            "confidence": state["confidence"],
+        },
+    }
+
+async def review_node(state: AgentState) -&gt; dict[str, Any]:
+    reason = state["review_reason"] or "Policy requires human review"
+    async with MCPToolClient() as mcp:
+        result = await mcp.call_tool(
+            "create_review_task",
+            {
+                "document_id": state["document_id"],
+                "reason": reason,
+                "extracted_data": state["extracted_data"],
+            },
+        )
+    return {
+        "review_task": result["task"],
+        "final_status": "review_required",
+        "final_output": {
+            "status": "review_required",
+            "document_id": state["document_id"],
+            "document_type": state["document_type"],
+            "data": state["extracted_data"],
+            "confidence": state["confidence"],
+            "review_task": result["task"],
+        },
+    }
+
+graph_builder = StateGraph(AgentState)
+graph_builder.add_node("classify_document_node", classify_document_node)
+graph_builder.add_node("get_policy_node", get_policy_node)
+graph_builder.add_node("extract_data_node", extract_data_node)
+graph_builder.add_node("validate_output_node", validate_output_node)
+graph_builder.add_node("approve_node", approve_node)
+graph_builder.add_node("review_node", review_node)
+
+graph_builder.add_edge(START, "classify_document_node")
+graph_builder.add_edge("classify_document_node", "get_policy_node")
+graph_builder.add_edge("get_policy_node", "extract_data_node")
+graph_builder.add_edge("extract_data_node", "validate_output_node")
+
+graph_builder.add_conditional_edges(
+    "validate_output_node",
+    route_after_validation,
+    {"approve_node": "approve_node", "review_node": "review_node"},
+)
+
+graph_builder.add_edge("approve_node", END)
+graph_builder.add_edge("review_node", END)
+
+graph = graph_builder.compile(checkpointer=MemorySaver())
+
+async def main():
+    input_state: AgentState = {
+        "document_id": "doc-1001",
+        "customer_id": "ACME_LOGISTICS",
+        "raw_text": '''
+        Rate Confirmation
+        Customer: ACME Logistics
+        Ref Number: RC-7788
+        Total Amount: 1200 USD
+        Pickup: Dallas
+        Drop: Houston
+        ''',
+    }
+
+    result = await graph.ainvoke(input_state)
+    print(result["final_output"])
+
+if __name__ == "__main__":
+    asyncio.run(main())
+</code></pre>
+          </div>
+        </div>
+
+        <div class="code-card">
+          <div class="code-head">
+            <div>
+              <strong>Example 3: How To Run And Explain It</strong>
+              <span>Smallest useful operating notes</span>
+            </div>
+            <span class="pill">runbook</span>
+          </div>
+          <div class="code-body">
+<pre><code># 1. Install
+pip install -U langgraph langchain-openai mcp
+
+# 2. Export model key
+export OPENAI_API_KEY="your_key_here"
+
+# 3. Run the LangGraph workflow
+python langgraph_agent.py
+
+# The workflow will launch the MCP server over stdio:
+# stdio_client(command="python", args=["mcp_server.py"])
+</code></pre>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top: 1rem;">
+          <div class="legend-box">
+            <span class="ribbon">What This Demonstrates</span>
+            <ul>
+              <li><strong>LangGraph:</strong> manages state, node execution, and routing.</li>
+              <li><strong>MCP:</strong> exposes tools like policy lookup and review-task creation.</li>
+              <li><strong>LLM:</strong> performs interpretation and extraction within the workflow.</li>
+            </ul>
+          </div>
+          <div class="callout">
+            <span class="ribbon">Best Spoken Summary</span>
+            <p>In this implementation, LangGraph is the workflow brain and MCP is the tool connector layer. The graph decides when to classify, fetch policy, extract data, validate output, and escalate. MCP standardizes how those tools are called, so the workflow stays clean and enterprise integrations stay reusable.</p>
+          </div>
+        </div>
+
+        <details class="deep-only" style="margin-top: 1rem;">
+          <summary>How I Would Make This More Production-Grade</summary>
+          <p>I would replace the illustrative extraction with schema-enforced outputs, reuse MCP sessions more efficiently, add retries around transient tool failures, move ephemeral run state into Redis, keep durable workflow records in a relational store, and add tracing with a platform like Langfuse. If human approval needed to pause and resume the graph, I would use LangGraph checkpoints explicitly for that workflow interrupt.</p>
+        </details>
+      </section>
+
+      <section class="panel" id="aws-architecture">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">AWS Architecture</span>
+            <h2>Production AWS Diagram For A LangGraph Document Parsing Agent</h2>
+            <p class="section-kicker">Use this when the interviewer asks how you would deploy a real enterprise document-parsing agent at scale. The clean answer is: LangGraph runs inside worker services, while AWS managed services handle ingress, storage, queues, OCR, model access, state, review routing, and observability.</p>
+          </div>
+          <div class="pill-row">
+            <span class="pill">100k Requests / Month</span>
+            <span class="pill">Async-First Design</span>
+            <span class="pill">Managed AWS Services</span>
+          </div>
+        </div>
+
+        <div class="aws-architecture-board">
+          <div class="aws-meta-strip">
+            <div class="aws-meta">
+              <strong>Traffic Shape</strong>
+              <p>About 3.3k requests/day on average, but design for bursty uploads, retries, and large documents.</p>
+            </div>
+            <div class="aws-meta">
+              <strong>Why Async</strong>
+              <p>OCR, LLM extraction, human review, and reprocessing are all safer as queue-driven background workflows.</p>
+            </div>
+            <div class="aws-meta">
+              <strong>LangGraph Role</strong>
+              <p>Owns state, branching, checkpoints, retries, and human approval resume points inside the worker tier.</p>
+            </div>
+            <div class="aws-meta">
+              <strong>Reliability Goal</strong>
+              <p>Durable job handoff, resumable runs, DLQ recovery, traceability, and tenant-safe document handling.</p>
+            </div>
+          </div>
+
+          <div class="aws-flow">
+            <div class="aws-column">
+              <div class="aws-column-head edge">Edge &amp; Intake</div>
+              <article class="aws-card edge-card">
+                <h3>Client / Reviewer UI / Partner API</h3>
+                <p>Document upload, run lookup, and human approval actions enter through a controlled edge.</p>
+                <small>Examples: internal ops UI, public REST API, admin review console.</small>
+              </article>
+              <article class="aws-card edge-card">
+                <h3>Route 53 + WAF + ALB</h3>
+                <p>DNS, TLS termination, basic web protection, and request routing into the application tier.</p>
+                <small>Why it matters: rate limiting, bot protection, and clean path-based routing.</small>
+              </article>
+              <article class="aws-card edge-card">
+                <h3>ECS Fargate API Service</h3>
+                <p>Validates input, creates run records, uploads raw files to S3, and enqueues jobs for workers.</p>
+                <small>FastAPI is a natural fit here for <span class="mono">POST /runs</span>, <span class="mono">GET /runs/{id}</span>, and review endpoints.</small>
+              </article>
+            </div>
+
+            <div class="aws-column">
+              <div class="aws-column-head runtime">Agent Runtime</div>
+              <article class="aws-card runtime-card">
+                <h3>SQS + DLQ</h3>
+                <p>Acts as the durable async backbone so uploads are accepted quickly and processing can scale independently.</p>
+                <small>Main queue for ingest; dead-letter queue for poison documents, OCR failures, or repeated extraction errors.</small>
+              </article>
+              <article class="aws-card runtime-card">
+                <h3>ECS Fargate Worker Running LangGraph</h3>
+                <p>Runs the state graph: fetch document, OCR or text extraction, classify, retrieve policy context, extract fields, validate, route to auto-approve or review.</p>
+                <small>Each node is explicit, so failures and resumes are visible rather than buried inside one long request.</small>
+              </article>
+              <article class="aws-card runtime-card">
+                <h3>Amazon Textract + SNS Callback</h3>
+                <p>Handles OCR asynchronously for scanned or low-text PDFs, then signals the workflow to continue.</p>
+                <small>Best pattern: worker starts async OCR job, stores checkpoint, then resumes when callback event lands.</small>
+              </article>
+              <article class="aws-card runtime-card">
+                <h3>Amazon Bedrock</h3>
+                <p>Provides governed model access for classification, extraction, structured repair, validation, and summarization.</p>
+                <small>Enterprise value: IAM-based access, controlled model surface, guardrails, and audit-friendly cloud alignment.</small>
+              </article>
+            </div>
+
+            <div class="aws-column">
+              <div class="aws-column-head data">State, Storage &amp; Retrieval</div>
+              <article class="aws-card data-card">
+                <h3>S3 Raw / Processed / Review Buckets</h3>
+                <p>Stores uploaded files, OCR artifacts, normalized JSON payloads, reviewer snapshots, and export-ready outputs.</p>
+                <small>Use bucket separation, lifecycle rules, and SSE-KMS encryption.</small>
+              </article>
+              <article class="aws-card data-card">
+                <h3>Aurora PostgreSQL</h3>
+                <p>System of record for runs, LangGraph checkpoints, approval status, audit events, and review decisions.</p>
+                <small>Durable truth belongs here, not only in memory or Redis.</small>
+              </article>
+              <article class="aws-card data-card">
+                <h3>ElastiCache Redis</h3>
+                <p>Short-lived cache for idempotency keys, hot metadata, throttling, and ephemeral run acceleration.</p>
+                <small>Use Redis for speed; do not treat it as the only durable workflow store.</small>
+              </article>
+              <article class="aws-card data-card">
+                <h3>OpenSearch Vector / Hybrid Index</h3>
+                <p>Optional but valuable if the agent also uses policy retrieval, examples, or historical document patterns during extraction.</p>
+                <small>Vector search helps semantic grounding; lexical search still matters for exact identifiers and company names.</small>
+              </article>
+            </div>
+
+            <div class="aws-column">
+              <div class="aws-column-head ops">Security, Ops &amp; Release</div>
+              <article class="aws-card ops-card">
+                <h3>IAM + Secrets Manager + KMS</h3>
+                <p>Every service gets least-privilege access, encrypted secrets, and protected document storage.</p>
+                <small>This is part of the interview story whenever you mention enterprise readiness.</small>
+              </article>
+              <article class="aws-card ops-card">
+                <h3>CloudWatch Logs, Metrics, Alarms</h3>
+                <p>Track queue depth, OCR latency, Bedrock latency, extraction success rate, review rate, worker failures, and DLQ growth.</p>
+                <small>You want observability by step, not just a final success or fail counter.</small>
+              </article>
+              <article class="aws-card ops-card">
+                <h3>CI/CD via GitHub Actions + ECR + ECS Deploy</h3>
+                <p>Build image, test prompts and graph nodes, push to ECR, deploy to ECS across dev, staging, and prod.</p>
+                <small>Add release gates for eval datasets, schema validation, and rollback safety.</small>
+              </article>
+              <article class="aws-card ops-card">
+                <h3>Human Review Console</h3>
+                <p>Low-confidence or policy-sensitive runs pause for analyst review, then resume from the saved LangGraph checkpoint.</p>
+                <small>This is where AI operations becomes managed service delivery, not just model inference.</small>
+              </article>
+            </div>
+          </div>
+
+          <div class="aws-route-strip">
+            <div class="aws-route"><strong>Path 1:</strong> upload enters API, file lands in S3, job goes to SQS.</div>
+            <div class="aws-route"><strong>Path 2:</strong> worker consumes job, runs LangGraph, invokes Textract and Bedrock as needed.</div>
+            <div class="aws-route"><strong>Path 3:</strong> checkpoints, outputs, and review state persist in Aurora and S3; Redis accelerates hot paths.</div>
+            <div class="aws-route"><strong>Path 4:</strong> CloudWatch, alarms, audit data, and CI/CD keep the system operable and releasable.</div>
+          </div>
+        </div>
+
+        <div class="aws-spoken-grid" style="margin-top: 1rem;">
+          <div class="callout">
+            <span class="ribbon">Best Spoken 90-Second Answer</span>
+            <p>For a production AWS deployment, I would treat the document agent as an async platform, not a synchronous API call. The API tier would run on ECS Fargate behind an ALB and WAF, accept uploads, store raw documents in S3, create run records, and enqueue jobs in SQS. Worker services on ECS would run the LangGraph workflow, which is where stateful steps like OCR fallback, classification, extraction, validation, and approval routing live. OCR would use Textract asynchronously, model inference would use Bedrock, durable workflow state and checkpoints would live in Aurora PostgreSQL, and Redis would handle short-lived cache and idempotency. If retrieval is needed, I would use OpenSearch for hybrid or vector search. Then CloudWatch, alarms, IAM, secrets management, and CI/CD complete the production picture.</p>
+          </div>
+          <div class="legend-box">
+            <span class="ribbon">How To Explain The LangGraph Fit</span>
+            <ul>
+              <li><strong>Node examples:</strong> ingest, OCR, classify, extract, validate, route, persist.</li>
+              <li><strong>Why graph:</strong> supports branching, retries, and human-in-the-loop resume points cleanly.</li>
+              <li><strong>Why not one request thread:</strong> OCR and review pauses do not belong inside a single synchronous HTTP lifecycle.</li>
+              <li><strong>Why AWS managed services:</strong> you offload infrastructure burden and keep the architecture explainable.</li>
+            </ul>
+          </div>
+        </div>
+
+        <details class="deep-only" style="margin-top: 1rem;">
+          <summary>What I Would Say If Asked About Sizing For 100k Requests / Month</summary>
+          <p>I would start with a small but highly available setup: two API tasks on ECS Fargate across availability zones, two to four worker tasks with autoscaling based on SQS queue depth, Aurora PostgreSQL for durable run state, a small multi-AZ Redis cluster, and S3 plus Textract and Bedrock as managed services. The key point is that 100k per month is not extreme average throughput, but enterprise design still needs to account for burst uploads, retry storms, and long-running OCR or review flows.</p>
+        </details>
+
+        <details class="deep-only">
+          <summary>What Makes This Production-Grade Instead Of A Demo</summary>
+          <p>The difference is durable state, queue-based backpressure, checkpoint-based resume, human approval routing, tenant-safe storage, observability, and release discipline. A demo tries to do everything in one process. A production deployment splits concerns so ingestion, orchestration, OCR, model inference, review operations, and monitoring can each scale and fail safely.</p>
+        </details>
+      </section>
+
+      <section class="panel" id="explain-it">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">How To Explain It</span>
+            <h2>Reusable Scripts You Can Say Out Loud</h2>
+            <p class="section-kicker">Read these until they sound natural. The goal is high-signal clarity, not memorized theatrics.</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="script">
+            <span class="ribbon">30-Second Version</span>
+            <p>One relevant system I worked on was a freight document intelligence workflow that automated extraction from operational PDFs. The key challenge was balancing automation with trust, because document quality varied and outputs needed to be audit-friendly. So the system used text extraction with OCR fallback, document-type detection, model routing, structured extraction, deterministic cleanup rules, and confidence-based routing into auto-approval or human review.</p>
+          </div>
+          <div class="script">
+            <span class="ribbon">90-Second Architecture Answer</span>
+            <p>I would describe it as a bounded AI workflow rather than a free-form agent. A document comes in through UI or API, we create a tracked unit of work, extract text, fall back to OCR for scanned PDFs, and classify the document type. Based on that type and whether the document is text-heavy or vision-heavy, we route it to the right extraction path. The model returns structured JSON, then deterministic business rules normalize the output before we make trust decisions. Confidence score and company approval policy decide whether the document is auto-approved or sent into a review queue. Reviewer edits and status events are stored for auditability and future improvement.</p>
+          </div>
+        </div>
+
+        <details open>
+          <summary>3-Minute Deep-Dive Answer</summary>
+          <p>What made the workflow production-grade was not just the extraction itself, but the control logic around it. We had to handle multiple document types, including machine-generated PDFs and scanned image-based ones, so the pipeline started with ingestion, file validation, and text extraction. If text extraction looked weak, we pivoted into OCR and vision-friendly processing rather than treating all inputs the same.</p>
+          <p>Then we classified the document type because extraction schema and model strategy depend on it. We also identified the likely issuing company because trusted entities can follow different approval rules. Extraction itself was structured and schema-oriented, but we did not stop there. We applied deterministic post-processing rules to clean fields, normalize values, and handle narrow business cases that should never be left entirely to model interpretation.</p>
+          <p>After that, confidence and policy drove the routing. High-trust cases could complete with low friction, while uncertain or new-pattern cases were routed into human review. Reviewers could approve, modify, or reject, and some outcomes required elevated approval. That matters because in enterprise settings the goal is not maximum automation, it is controlled automation. We also emitted processing events and stored metadata so the system was observable and debuggable. If I were evolving it further for a role like this, I would formalize the orchestration with LangGraph, move ephemeral workflow state to Redis, use Bedrock for governed model access in AWS, and add Langfuse for richer tracing and evaluation.</p>
+        </details>
+
+        <details open>
+          <summary>If The Interviewer Interrupts, Pivot To This</summary>
+          <p>The shortest useful summary is: it is a stateful extraction workflow with explicit trust controls. The important engineering choices were modality-aware routing, deterministic validation after the model, and a review path that turns uncertainty into visible operational work rather than silent errors.</p>
+        </details>
+
+        <div class="two-col" style="margin-top: 1rem;">
+          <div class="callout">
+            <span class="ribbon">Why this is agentic without buzzword inflation</span>
+            <p>This workflow is agentic because the AI component participates in a multi-step control loop: it helps classify the input, extract structured state, and influence downstream routing. But it is bounded by policy, schema, and review logic. That is the enterprise version of agentic AI: controlled reasoning inside a governed workflow.</p>
+          </div>
+          <div class="callout">
+            <span class="ribbon">Why bounded workflows beat open-ended autonomy</span>
+            <p>Open-ended autonomy is impressive in demos but risky in operations. Bounded workflows are easier to audit, easier to evaluate, safer to release, and better aligned with managed services where correctness, repeatability, and controlled escalation matter more than novelty.</p>
+          </div>
+        </div>
+
+        <details class="deep-only">
+          <summary>How To Answer “Where does human-in-the-loop fit?”</summary>
+          <p>Human-in-the-loop belongs at the point where model uncertainty intersects business risk. In this workflow, I use reviewers not as a patch for a broken model, but as a deliberate control layer. Unknown companies, medium-confidence outputs, conflicting signals, and policy-sensitive cases all go through review. That preserves trust while still allowing automation where the workflow has learned enough to be safe.</p>
+        </details>
+
+        <details class="deep-only">
+          <summary>How To Answer “How would you productionize this further with LangGraph / Bedrock / Redis / Langfuse?”</summary>
+          <p>I would model the workflow stages as explicit graph nodes with checkpointable state, move transient run state and progress tracking into Redis, keep authoritative audit records in a relational store, call Bedrock for enterprise-friendly model access under IAM and centralized controls, and add Langfuse for prompt, trace, cost, and quality inspection across each step. The main point is that these tools improve governability and operations, not just developer ergonomics.</p>
+        </details>
+      </section>
+
+      <section class="panel" id="production-grade">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Production-Grade Playbook</span>
+            <h2>The Hard Topics They May Probe</h2>
+            <p class="section-kicker">Use these cards when the conversation shifts from “what it does” to “why it is safe, reliable, and enterprise-ready.”</p>
+          </div>
+        </div>
+
+        <div class="mini-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+          <article class="play-card">
+            <h3>Failure Handling &amp; Retries</h3>
+            <p><strong>Principle:</strong> retry only transient failures and keep failure visible in state.</p>
+            <p><strong>Case example:</strong> model call failure or weak text extraction should trigger fallback or escalation, not silent success.</p>
+            <p><strong>Ideal answer:</strong> “I separate recoverable failures like upstream model errors from hard validation failures, and retries are bounded, observable, and policy-aware.”</p>
+            <p><strong>Avoid saying:</strong> “We just call the model again until it works.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Timeout Strategy</h3>
+            <p><strong>Principle:</strong> each step gets an operational budget.</p>
+            <p><strong>Case example:</strong> OCR and large-document extraction need different timeout envelopes from simple entity detection.</p>
+            <p><strong>Ideal answer:</strong> “Timeouts depend on workload class, and long-running paths should expose progress instead of looking hung.”</p>
+            <p><strong>Avoid saying:</strong> “The timeout is whatever the server default is.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Prompt Reliability &amp; Schema Discipline</h3>
+            <p><strong>Principle:</strong> prompts should target fixed tasks and fixed output shapes.</p>
+            <p><strong>Case example:</strong> type detection, company extraction, and full document extraction are separate prompt responsibilities.</p>
+            <p><strong>Ideal answer:</strong> “I decompose tasks and enforce structured outputs so the downstream pipeline has predictable contracts.”</p>
+            <p><strong>Avoid saying:</strong> “I use one giant prompt for everything.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Hallucination Prevention</h3>
+            <p><strong>Principle:</strong> constrain generation and verify output before trust.</p>
+            <p><strong>Case example:</strong> only extract data present in the source, then run normalization and review routing.</p>
+            <p><strong>Ideal answer:</strong> “I reduce hallucination through schema constraints, source-grounded extraction, deterministic cleanup, and human review for uncertain cases.”</p>
+            <p><strong>Avoid saying:</strong> “The model is accurate enough most of the time.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Deterministic Post-Processing Rules</h3>
+            <p><strong>Principle:</strong> narrow business rules should be explicit code, not prompt hope.</p>
+            <p><strong>Case example:</strong> normalize stop types, clean noisy text, apply tightly-scoped field propagation rules.</p>
+            <p><strong>Ideal answer:</strong> “I use the LLM for interpretation and code for policy, normalization, and edge-case safety.”</p>
+            <p><strong>Avoid saying:</strong> “If the prompt is good enough we don’t need rules.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Approval Gates</h3>
+            <p><strong>Principle:</strong> trust should be earned and policy-driven.</p>
+            <p><strong>Case example:</strong> approved entities can fast-path, but new patterns require review or admin approval.</p>
+            <p><strong>Ideal answer:</strong> “Approval state is part of the workflow, not an afterthought, because it encodes operational trust.”</p>
+            <p><strong>Avoid saying:</strong> “High confidence means automatic trust.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>State vs Cache vs Retrieval</h3>
+            <p><strong>Principle:</strong> separate transient workflow state from durable truth and knowledge search.</p>
+            <p><strong>Case example:</strong> document/extraction rows are durable records; run progress is transient; future retrieval is separate.</p>
+            <p><strong>Ideal answer:</strong> “Workflow state and cache are operational concerns; retrieval is a knowledge concern; audit data belongs in a durable store.”</p>
+            <p><strong>Avoid saying:</strong> “Everything can just go into Redis.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Auditability</h3>
+            <p><strong>Principle:</strong> every important state change should be explainable later.</p>
+            <p><strong>Case example:</strong> store status transitions, reviewer notes, extraction model metadata, and corrections.</p>
+            <p><strong>Ideal answer:</strong> “I design workflow history so we can answer what happened, why it happened, and who changed it.”</p>
+            <p><strong>Avoid saying:</strong> “We can always reproduce it later.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Idempotency</h3>
+            <p><strong>Principle:</strong> repeated requests should not create duplicate operational side effects.</p>
+            <p><strong>Case example:</strong> API-based document ingestion should be designed to handle retries safely.</p>
+            <p><strong>Ideal answer:</strong> “I’d add an idempotency key or dedupe strategy for partner systems so resubmits do not duplicate workflow rows.”</p>
+            <p><strong>Avoid saying:</strong> “Duplicate requests are a client problem.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Observability</h3>
+            <p><strong>Principle:</strong> step-level traces are part of operating AI systems.</p>
+            <p><strong>Case example:</strong> emit progress events, log model path, token usage, and review outcomes.</p>
+            <p><strong>Ideal answer:</strong> “I need visibility into prompts, extraction path, latency, confidence, and reviewer corrections to debug quality issues.”</p>
+            <p><strong>Avoid saying:</strong> “We can monitor only HTTP success codes.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Evaluation &amp; Regression Checks</h3>
+            <p><strong>Principle:</strong> change control matters more than clever prompts.</p>
+            <p><strong>Case example:</strong> compare extraction quality on a fixed dataset before changing prompts, models, or thresholds.</p>
+            <p><strong>Ideal answer:</strong> “I would maintain a representative document set and compare schema correctness, field accuracy, latency, and review rate before release.”</p>
+            <p><strong>Avoid saying:</strong> “If reviewers don’t complain, the change was fine.”</p>
+          </article>
+
+          <article class="play-card">
+            <h3>Release Readiness</h3>
+            <p><strong>Principle:</strong> releasing AI workflows is an operational decision, not just a code merge.</p>
+            <p><strong>Case example:</strong> validate model behavior, routing thresholds, review queue impact, and logs before rollout.</p>
+            <p><strong>Ideal answer:</strong> “A release is ready when quality, traceability, fallback behavior, and operational load are all understood.”</p>
+            <p><strong>Avoid saying:</strong> “We deploy and tune in production.”</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="tough-questions">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Tough Question Bank</span>
+            <h2>Concise Answer + Deep Answer</h2>
+            <p class="section-kicker">Use the filters to focus your rehearsal. In interview mode, the shorter answers are enough. In study mode, open the deep answers too.</p>
+          </div>
+        </div>
+
+        <div class="toggle-row" aria-label="Question filters">
+          <button class="chip active" data-filter="all" type="button">All</button>
+          <button class="chip" data-filter="design" type="button">System Design</button>
+          <button class="chip" data-filter="routing" type="button">Routing</button>
+          <button class="chip" data-filter="guardrails" type="button">Guardrails</button>
+          <button class="chip" data-filter="platform" type="button">Platform</button>
+          <button class="chip" data-filter="evaluation" type="button">Evaluation</button>
+        </div>
+
+        <div class="qna-grid">
+          <article class="question-card" data-group="design">
+            <h3>How would you describe this as an agentic workflow?</h3>
+            <p><strong>Concise answer:</strong> It is a bounded multi-step AI workflow where the model helps classify, extract, and influence control flow, but policy, validation, and human approval remain explicit.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>I would avoid describing it as autonomous. The agentic part is that the workflow uses AI in multiple coordinated steps and branches based on outcomes. But the system is intentionally bounded because enterprise AI needs inspectability, approval controls, and failure-aware routing. So it is agentic by orchestration pattern, not by marketing language.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="routing">
+            <h3>Why split text-heavy and vision-heavy document paths?</h3>
+            <p><strong>Concise answer:</strong> Because modality affects both quality and cost. Text-first is cheaper and more predictable for machine-generated PDFs, while vision paths handle scanned or image-dominant documents better.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>I treat model routing as policy. If the text extraction is strong, I prefer a text-first path. If text is weak or the document is visibly scanned, I pivot into OCR and vision-aware extraction. That improves quality and keeps the system from paying the latency and cost tax of always using the heaviest path.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="routing">
+            <h3>How would you decide between auto-approval and human review?</h3>
+            <p><strong>Concise answer:</strong> I would combine model confidence with business trust signals such as previously approved entities or patterns, then route uncertain cases into review.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>Confidence alone is not enough because models can be confidently wrong. I would treat confidence as one signal alongside entity trust, document type, and policy sensitivity. Unknown companies, medium-confidence outputs, and new document patterns should go to review. Auto-approval should be reserved for known-good paths with strong operational evidence.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="guardrails">
+            <h3>How do you reduce hallucinations in document extraction?</h3>
+            <p><strong>Concise answer:</strong> Use source-grounded extraction, fixed schema outputs, deterministic cleanup, and human review for uncertain cases.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>I reduce hallucinations in layers: narrow task prompts, explicit rule that only source-present data should be extracted, schema-constrained JSON, post-processing validation, and review routing when confidence or trust is weak. For enterprise use, prevention is better than post-hoc apology.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="platform">
+            <h3>Where would Redis fit if you evolved this system?</h3>
+            <p><strong>Concise answer:</strong> Redis would hold ephemeral run state, progress events, transient cache, and maybe checkpoints, while the relational database remains the source of truth for documents, approvals, and audit history.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>I would not move authoritative records into Redis. The durable audit trail belongs in a relational store. Redis is useful for fast-changing operational state like workflow status, event fan-out, session data, dedupe keys, or low-latency caches. That separation keeps the system both fast and trustworthy.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="platform">
+            <h3>How would you compare Bedrock with direct model APIs?</h3>
+            <p><strong>Concise answer:</strong> Direct APIs can be faster to prototype with, but Bedrock fits enterprise environments better because model access, IAM, governance, and cloud alignment are more centralized.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>For a consulting and managed-services context, Bedrock is attractive because it aligns model access with AWS-native controls. That matters for procurement, IAM, auditability, and security posture. The core design would stay the same, but the operational governance gets stronger.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="design">
+            <h3>Why would you use LangGraph instead of a simple chain?</h3>
+            <p><strong>Concise answer:</strong> Because the workflow branches, retries, escalates, and contains stateful control points that are awkward in a linear chain.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>A simple chain is fine for straight-line prompt flows. But once you have OCR fallback, type-based routing, company-policy branching, and human approval checkpoints, you already have a graph. LangGraph would make those transitions explicit, checkpointable, and easier to observe or resume.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="evaluation">
+            <h3>How would you evaluate changes before releasing them?</h3>
+            <p><strong>Concise answer:</strong> I would keep a representative evaluation set and compare field accuracy, schema compliance, latency, confidence routing behavior, and review rate before rollout.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>For a workflow like this, I would evaluate multiple layers: classification quality, extraction completeness, schema correctness, reviewer correction rate, and operational metrics like latency or token cost. If a prompt or model change reduces reviewer load without hurting correctness, that is meaningful. If it only sounds better but increases policy risk, it is not ready.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="evaluation">
+            <h3>How would you scale this to more document types?</h3>
+            <p><strong>Concise answer:</strong> Add a new schema, detection logic, prompt path, validation rules, and evaluation set without disturbing the control framework.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>The key is separating the workflow skeleton from the document-specific extraction logic. Intake, status tracking, review flow, and auditability stay the same. What changes per document type are detection rules, extraction schema, model path preference, and evaluation coverage. That modularity keeps growth manageable.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="guardrails">
+            <h3>What guardrails matter most here?</h3>
+            <p><strong>Concise answer:</strong> input validation, schema-constrained outputs, deterministic post-processing, approval gates, and audit-friendly review states.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>I think about guardrails at three points: before the model, around the model, and after the model. Before means validating file type and routing context. Around means narrow prompts and schema shape. After means normalization, trust-policy checks, and human approval when needed. The strongest systems use all three layers.</p>
+            </details>
+          </article>
+
+          <article class="question-card" data-group="platform">
+            <h3>What does enterprise governance mean in a system like this?</h3>
+            <p><strong>Concise answer:</strong> It means that quality, access, approval, traceability, and change control are designed into the workflow instead of handled ad hoc.</p>
+            <details class="deep-only">
+              <summary>Deep answer</summary>
+              <p>Enterprise governance is not only about security. It includes who can approve new trusted entities, how model changes are evaluated, what gets logged, how errors are reviewed, and how partner systems consume results with status context. In other words, governance is workflow design plus operational discipline.</p>
+            </details>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="your-story">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Your Story</span>
+            <h2>Three Polished Stories + One Flagship Walkthrough</h2>
+            <p class="section-kicker">These are the stories that help the interviewer connect your resume to their role without you needing to oversell unfamiliar tools.</p>
+          </div>
+        </div>
+
+        <div class="story-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+          <article class="story-card">
+            <h3>Story 1: Workflow Automation In Logistics</h3>
+            <p><strong>Context:</strong> operational processes were document-heavy and manual.</p>
+            <p><strong>What you did:</strong> built backend services and workflow automation to turn manual operations into structured system flows.</p>
+            <p><strong>Why it matters:</strong> this maps directly to PwC’s managed-services mindset: repeatability, operational clarity, and reducing human friction without losing control.</p>
+          </article>
+
+          <article class="story-card">
+            <h3>Story 2: Retrieval / Operational Knowledge Access</h3>
+            <p><strong>Context:</strong> teams needed faster access to operational knowledge and documents.</p>
+            <p><strong>What you did:</strong> worked on retrieval-oriented search and AI-assisted backend flows to improve knowledge access.</p>
+            <p><strong>Why it matters:</strong> it shows you understand grounding and information access, not just generation.</p>
+          </article>
+
+          <article class="story-card">
+            <h3>Story 3: LLM Capabilities In Product Workflows</h3>
+            <p><strong>Context:</strong> early AI capabilities needed to live inside actual applications.</p>
+            <p><strong>What you did:</strong> integrated LLM-based functionality into application and backend workflows.</p>
+            <p><strong>Why it matters:</strong> it shows you think about integration and software behavior, not just experiments.</p>
+          </article>
+        </div>
+
+        <div class="two-col" style="margin-top: 1rem;">
+          <div class="story-card">
+            <h3>Flagship Walkthrough: How To Tell The Freight Workflow Story</h3>
+            <p><strong>Context:</strong> operations teams were processing freight PDFs manually, with inconsistent quality and slow turnaround.</p>
+            <p><strong>Operational pain:</strong> different document types, scanned images, and inconsistent layouts made rule-only automation brittle.</p>
+            <p><strong>System design:</strong> build a document workflow that can ingest from UI or API, extract or recover text, classify type, route to the right model path, output structured JSON, apply deterministic rules, and route uncertainty into human review.</p>
+            <p><strong>Human control strategy:</strong> use confidence and entity-trust policy to decide whether a document completes automatically or enters review.</p>
+            <p><strong>Production risk handling:</strong> explicit statuses, audit trail, progress events, reviewer modifications, and policy-based approval.</p>
+          </div>
+
+          <div class="story-card">
+            <h3>What You Owned / Tradeoffs / What You’d Improve</h3>
+            <p><strong>What I owned:</strong> backend workflow thinking, extraction orchestration logic, operational reliability, and turning messy document processes into structured service behavior.</p>
+            <p><strong>Tradeoffs I made:</strong> favored bounded workflow control over open-ended autonomy; used review to protect correctness where uncertainty existed.</p>
+            <p><strong>What I’d do differently now:</strong> formalize orchestration as a graph, introduce stronger eval datasets, move transient state into Redis, and add richer tracing via a platform like Langfuse.</p>
+            <p><strong>How this maps to PwC:</strong> it demonstrates exactly the kind of production AI engineering PwC describes: agentic workflow logic, APIs, policy-driven controls, observability, and readiness for enterprise operation.</p>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top: 1rem;">
+          <span class="ribbon">Best version of “Tell me about your recent relevant project”</span>
+          <p>My most relevant recent project was a freight document intelligence workflow for operational PDFs. The interesting part was not just extraction, but how we made the system trustworthy in production. We handled machine-generated and scanned documents differently, classified document types before extraction, generated structured outputs, applied deterministic cleanup rules, and routed uncertain cases into human review rather than hiding them. That project is the clearest example of how I think about applied AI systems: bounded, auditable, and operationally useful.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="rapid-revision">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Rapid Revision</span>
+            <h2>Final Memory Board</h2>
+            <p class="section-kicker">This is your last 5-minute skim before the call. If nothing else, memorize these blocks.</p>
+          </div>
+        </div>
+
+        <div class="rapid-columns">
+          <div class="flash-card">
+            <h3>10 Must-Remember Lines</h3>
+            <ol>
+              <li>This is a bounded AI workflow, not an open-ended autonomous agent.</li>
+              <li>The value comes from control logic around the model, not just the model itself.</li>
+              <li>Text-heavy and vision-heavy documents should not be treated identically.</li>
+              <li>Structured outputs matter because downstream systems need contracts.</li>
+              <li>Deterministic post-processing is part of reliability, not a hack.</li>
+              <li>Confidence matters only if it changes routing behavior.</li>
+              <li>Human review is a strength in enterprise AI, not a failure.</li>
+              <li>Known-good entities can fast-path only behind explicit policy.</li>
+              <li>Observability is required to operate and improve AI workflows safely.</li>
+              <li>Production readiness means quality, traceability, fallback behavior, and operational load are understood.</li>
+            </ol>
+          </div>
+
+          <div class="flash-card">
+            <h3>10 Red Flags: Do Not Say These</h3>
+            <ol>
+              <li>“The model just figures it out.”</li>
+              <li>“We trust high confidence automatically.”</li>
+              <li>“Human review is only there because the model is weak.”</li>
+              <li>“One prompt can handle all document types.”</li>
+              <li>“If there is a failure we just rerun it.”</li>
+              <li>“Observability is mostly logging HTTP status codes.”</li>
+              <li>“All state can sit in Redis.”</li>
+              <li>“Evaluation is basically eyeballing outputs.”</li>
+              <li>“Agentic means fully autonomous.”</li>
+              <li>“We deploy and then fix the workflow in production.”</li>
+            </ol>
+          </div>
+
+          <div class="flash-card">
+            <h3>10 One-Line Definitions</h3>
+            <ol>
+              <li><strong>Agentic workflow:</strong> AI plus tools plus state plus routing toward a business goal.</li>
+              <li><strong>LangGraph:</strong> stateful graph orchestration for branching, checkpoints, and retries.</li>
+              <li><strong>LangChain:</strong> utilities for prompts, retrieval, tools, and model integrations.</li>
+              <li><strong>MCP:</strong> a standard way to expose tools and context to models.</li>
+              <li><strong>Redis:</strong> fast storage for ephemeral state, cache, and low-latency workflow coordination.</li>
+              <li><strong>Bedrock:</strong> managed model access inside AWS with enterprise-friendly controls.</li>
+              <li><strong>Langfuse:</strong> tracing and evaluation visibility for LLM workflows.</li>
+              <li><strong>Guardrail:</strong> a control that reduces unsafe or invalid behavior before or after model output.</li>
+              <li><strong>Evaluation:</strong> repeatable measurement of workflow quality and regression risk.</li>
+              <li><strong>Idempotency:</strong> the property that repeated requests do not create duplicate side effects.</li>
+            </ol>
+          </div>
+
+          <div class="flash-card">
+            <h3>Final 5-Minute Rehearsal Checklist</h3>
+            <ul>
+              <li>Say your one-line positioning statement once out loud.</li>
+              <li>Rehearse the 30-second and 90-second system answers.</li>
+              <li>Remember the workflow order: intake -> detect -> route -> extract -> normalize -> approve/review -> trace.</li>
+              <li>Keep saying “bounded, auditable, and reviewable.”</li>
+              <li>Tie everything back to production reliability and managed-services delivery.</li>
+              <li>If unsure, explain your design choice instead of bluffing tool depth.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        Built as a private offline interview prep page. Safe to rehearse from directly before the call.
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const navLinks = Array.from(document.querySelectorAll(".nav a"));
+      const sections = navLinks
+        .map((link) => document.querySelector(link.getAttribute("href")))
+        .filter(Boolean);
+
+      const setActiveNav = () => {
+        let current = sections[0];
+        const offset = window.scrollY + 140;
+        sections.forEach((section) => {
+          if (section.offsetTop <= offset) current = section;
+        });
+        navLinks.forEach((link) => {
+          link.classList.toggle("active", link.getAttribute("href") === "#" + current.id);
+        });
+      };
+
+      window.addEventListener("scroll", setActiveNav, { passive: true });
+      setActiveNav();
+
+      const chips = document.querySelectorAll(".chip");
+      const cards = document.querySelectorAll(".question-card[data-group]");
+
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          const filter = chip.dataset.filter;
+          chips.forEach((c) => c.classList.toggle("active", c === chip));
+          cards.forEach((card) => {
+            const visible = filter === "all" || card.dataset.group === filter;
+            card.classList.toggle("hidden", !visible);
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
